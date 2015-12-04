@@ -212,7 +212,7 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 #Winmerge
-.bak
+*.bak
 
 #Qt
 GeneratedFiles/
