@@ -4,6 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QTimer>
 #include <QTcpServer>
+#include <QTime>
 
 #include "ui_zegotocontrolcenter.h"
 #include "link.h"
@@ -77,6 +78,12 @@ private:
 	void setComboParkPosition(const char *response);
 
 	void closeEvent(QCloseEvent *event);
+
+	QTime LocalSideralTime;
+	QTime UniversalTime;
+	QTime RightAscension;
+
+	QTime ParseResponse(const char * response);
 };
 
 #endif // ZEGOTOCONTROLCENTER_H

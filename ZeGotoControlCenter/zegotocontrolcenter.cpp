@@ -223,10 +223,12 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 
 	else if (strcmp(":GS#", command) == 0)
 	{
+		LocalSideralTime = ParseResponse(response);
 		DisplayCoord(response, ui.label_LSTValue, false);
 	}
 	else if (strcmp(":GR#", command) == 0)
 	{
+		RightAscension = ParseResponse(response);
 		DisplayCoord(response, ui.label_RAValue, false);
 	}
 	else if (strcmp(":GD#", command) == 0)
@@ -243,6 +245,7 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 	else if (strcmp(":GL#", command) == 0)
 	{
+		UniversalTime = ParseResponse(response);
 		DisplayCoord(response, ui.label_UTCValue, false);
 	}
 	else if (strcmp(":rM#", command) == 0)
@@ -264,6 +267,14 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	else if (strcmp(":GpH#", command) == 0)
 	{
 		setComboParkPosition(response);
+	}
+
+	if (ui.tabWidget->currentWidget() == ui.tabMeridian)
+	{
+		int flip_in_secs = RightAscension.secsTo(LocalSideralTime);
+		QTime flip_in = QTime::fromMSecsSinceStartOfDay(flip_in_secs * 1000);
+
+		ui.label_FlipInValue->setText(flip_in.toString("h 'h' mm 'm' ss 's'"));
 	}
 }
 
@@ -292,6 +303,19 @@ void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg)
 			arg(minute, 2, 10, QChar('0')).
 			arg(second, 2, 10, QChar('0')));
 	}
+}
+
+QTime ZeGotoControlCenter::ParseResponse(const char * response)
+{
+	QString r(response);
+
+	r = r.remove('#').replace("*", ":").replace("'", ":");
+	QStringList l = r.split(':');
+	int hour = l[0].toInt();
+	int minute = l[1].toInt();
+	int second = l[2].toInt();
+
+	return QTime(hour, minute, second);
 }
 
 void ZeGotoControlCenter::on_TelescopePositionTime()
