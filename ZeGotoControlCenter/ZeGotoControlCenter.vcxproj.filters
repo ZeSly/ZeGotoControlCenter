@@ -74,6 +74,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_singleapplication.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="meridian_tab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="zegotocontrolcenter.h">

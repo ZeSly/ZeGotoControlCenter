@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>804</width>
-    <height>526</height>
+    <height>533</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,6 +42,12 @@ QPushButton
                                     stop: 0.51 #333, stop: 1 #333);
     color: #fff;
     padding: 1ex;
+}
+
+QMessageBox QPushButton
+{
+	min-width: 70px;
+	min-height: 22px;
 }
 
 QPushButton:hover
@@ -1722,8 +1728,8 @@ QSlider::handle:vertical:disabled
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -1752,8 +1758,8 @@ QSlider::handle:vertical:disabled
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -1784,8 +1790,8 @@ QSlider::handle:vertical:disabled
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -1819,8 +1825,8 @@ QSlider::handle:vertical:disabled
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -1849,8 +1855,8 @@ QSlider::handle:vertical:disabled
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -2012,8 +2018,8 @@ QSlider::handle:vertical:disabled
              </property>
              <property name="minimumSize">
               <size>
-               <width>32</width>
-               <height>32</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2050,8 +2056,8 @@ QSlider::handle:vertical:disabled
              </property>
              <property name="minimumSize">
               <size>
-               <width>32</width>
-               <height>32</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2088,8 +2094,8 @@ QSlider::handle:vertical:disabled
              </property>
              <property name="minimumSize">
               <size>
-               <width>32</width>
-               <height>32</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2126,8 +2132,8 @@ QSlider::handle:vertical:disabled
              </property>
              <property name="minimumSize">
               <size>
-               <width>32</width>
-               <height>32</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2164,8 +2170,8 @@ QSlider::handle:vertical:disabled
              </property>
              <property name="minimumSize">
               <size>
-               <width>32</width>
-               <height>32</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2734,7 +2740,7 @@ to current Alt/Az</string>
           <item>
            <widget class="QGroupBox" name="groupBox_PierPostion">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -2783,6 +2789,40 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="QCheckBox" name="checkBox_PierFlipAlert">
+               <property name="text">
+                <string>Alert</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_PierFlipAlert">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>minutes before</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QTimeEdit" name="timeEdit_PierFlipAlert">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumTime">
+                <time>
+                 <hour>0</hour>
+                 <minute>59</minute>
+                 <second>59</second>
+                </time>
+               </property>
+               <property name="displayFormat">
+                <string>mm:ss</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -2823,12 +2863,31 @@ to current Alt/Az</string>
                </item>
                <item>
                 <widget class="QPushButton" name="pushButton_PierFlipNow">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Flip now</string>
                  </property>
                 </widget>
                </item>
               </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>

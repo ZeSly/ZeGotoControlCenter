@@ -178,6 +178,7 @@ copydll.cmd "$(OutDir)"</Command>
     </ClCompile>
     <ClCompile Include="link.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="meridian_tab.cpp" />
     <ClCompile Include="park_tab.cpp" />
     <ClCompile Include="singleapplication.cpp" />
     <ClCompile Include="zegotocontrolcenter.cpp" />

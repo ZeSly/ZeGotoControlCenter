@@ -2,9 +2,11 @@
 #define ZEGOTOCONTROLCENTER_H
 
 #include <QtWidgets/QMainWindow>
+#include <QSettings>
 #include <QTimer>
 #include <QTcpServer>
 #include <QTime>
+#include <QSystemTrayIcon>
 
 #include "ui_zegotocontrolcenter.h"
 #include "link.h"
@@ -25,6 +27,7 @@ public:
 	void linkResponse(const char *command, const char *response);
 
 	void on_TelescopePositionTime();
+	void on_PierFlipAlertTimer();
 
 	void on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1);
 	void on_pushButton_Connect_clicked();
@@ -45,11 +48,15 @@ public:
 	void on_pushButton_TrackingLunar_clicked();
 	void on_pushButton_TrackingSolar_clicked();
 	void on_pushButton_TrackingCustom_clicked();
+	void on_pushButton_PierFlipNow_clicked();
 
 	// park_tab.cpp
 	void on_pushButton_Park_clicked();
 	void on_pushButton_Unpark_clicked();
 	void on_comboBox_ParkPositions_currentIndexChanged();
+
+	void on_checkBox_PierFlipAlert_clicked();
+	void on_timeEdit_PierFlipAlert_timeChanged(const QTime &time);
 
 	void ASCOMConnect();
 	void ASCOMDisconnect();
@@ -59,8 +66,11 @@ public:
 
 private:
 	Ui::ZeGotoControlCenterClass ui;
+	QSettings settings;
+	QSystemTrayIcon systrayIcon;
 	Link *link;
 	QTimer TelescopePositionTimer;
+	QTimer PierFlipAlertTimer;
 
 	void DisplayCoord(const char *s, QLabel *label, bool deg);
 

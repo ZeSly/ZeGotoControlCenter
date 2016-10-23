@@ -63,6 +63,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.setupUi(this);
 	this->setFixedSize(this->size());
 	ui.statusBar->setSizeGripEnabled(false);
+	systrayIcon.setIcon(QIcon(":/Images/Resources/em200_32.png"));
 
 	link = NULL;
 	ASCOMServer = NULL;
@@ -75,6 +76,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	}
 
 	connect(&TelescopePositionTimer, SIGNAL(timeout()), SLOT(on_TelescopePositionTime()));
+	connect(&PierFlipAlertTimer, SIGNAL(timeout()), SLOT(on_PierFlipAlertTimer()));
 	connect(QApplication::instance(), SIGNAL(showUp()), SLOT(on_SingleInstance()));
 
 	setConnectedWidgetEnabled(false);
@@ -83,6 +85,14 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.lineEdit_ParkPositionAz->setEnabled(false);
 
 	ui.label_OGCCVersion->setText(GetMyVersion());
+
+	bool alert = settings.value("PierFlipAlert").toBool();
+	ui.checkBox_PierFlipAlert->setChecked(alert);
+	ui.timeEdit_PierFlipAlert->setEnabled(alert);
+	ui.label_PierFlipAlert->setEnabled(alert);
+
+	QTime t = settings.value("PierFlipTime").toTime();
+	ui.timeEdit_PierFlipAlert->setTime(t);
 
 	startASCOMServer();
 
@@ -123,6 +133,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.groupBox_Tracking->setEnabled(enable);
 	ui.groupBox_ParkActions->setEnabled(enable);
 	ui.comboBox_ParkPositions->setEnabled(enable);
+	ui.pushButton_PierFlipNow->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -262,19 +273,25 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 	else if (strcmp(":pS#", command) == 0)
 	{
-		ui.label_PierSideValue->setText(QString(response).remove('#'));
+		QString side_of_pier = QString(response).remove('#');
+		ui.label_PierSideValue->setText(side_of_pier);
+		ui.label_SideOfPierValue->setText(side_of_pier);
 	}
 	else if (strcmp(":GpH#", command) == 0)
 	{
 		setComboParkPosition(response);
 	}
 
-	if (ui.tabWidget->currentWidget() == ui.tabMeridian)
-	{
-		int flip_in_secs = RightAscension.secsTo(LocalSideralTime);
-		QTime flip_in = QTime::fromMSecsSinceStartOfDay(flip_in_secs * 1000);
+	int flip_in_secs = RightAscension.secsTo(LocalSideralTime);
+	QTime flip_in = QTime::fromMSecsSinceStartOfDay(flip_in_secs * 1000);
 
-		ui.label_FlipInValue->setText(flip_in.toString("h 'h' mm 'm' ss 's'"));
+	ui.label_FlipInValue->setText(flip_in.toString("h 'h' mm 'm' ss 's'"));
+
+	if (ui.checkBox_PierFlipAlert->isChecked() && !PierFlipAlertTimer.isActive() && flip_in_secs != 0)
+	{
+		int flip_alert = flip_in.msecsSinceStartOfDay() - ui.timeEdit_PierFlipAlert->time().msecsSinceStartOfDay();
+		QTime t = QTime::fromMSecsSinceStartOfDay(flip_alert);
+		PierFlipAlertTimer.start(flip_alert);
 	}
 }
 
