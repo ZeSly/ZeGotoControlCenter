@@ -6,8 +6,8 @@
 
 int main(int argc, char *argv[])
 {
-	QApplication::setApplicationName("OpenGoto Control Center");
-	QApplication::setOrganizationName("ZeSly");
+	QCoreApplication::setApplicationName("ZeGoto Control Center");
+	QCoreApplication::setOrganizationName("ZeSly");
 
 	//#ifdef _DEBUG
 	//    QFile File("Resources/darkstyle.css");
