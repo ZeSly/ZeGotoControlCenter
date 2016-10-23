@@ -30,6 +30,8 @@ public:
 	void on_PierFlipAlertTimer();
 
 	void on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1);
+	void on_lineEdit_IPAddress_editingFinished();
+	void on_lineEdit_IPPort_editingFinished();
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Expand_clicked();
 	void on_pushButton_Stop_clicked();

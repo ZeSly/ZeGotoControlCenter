@@ -86,6 +86,12 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 
 	ui.label_OGCCVersion->setText(GetMyVersion());
 
+	ui.lineEdit_IPAddress->setText(settings.value("IPAddress").toString());
+	ui.lineEdit_IPPort->setText(settings.value("IPPort").toString());
+	QVariant ConnectionType = settings.value("ConnectionType");
+	int s = ui.comboBox_ConnectionType->findData(ConnectionType);
+	ui.comboBox_ConnectionType->setCurrentIndex(s);
+
 	bool alert = settings.value("PierFlipAlert").toBool();
 	ui.checkBox_PierFlipAlert->setChecked(alert);
 	ui.timeEdit_PierFlipAlert->setEnabled(alert);
@@ -152,6 +158,21 @@ void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const Q
 		ui.label_IPPort->setEnabled(false);
 		ui.lineEdit_IPPort->setEnabled(false);
 	}
+	
+	if (ASCOMServer != NULL)
+	{
+		settings.setValue("ConnectionType", ui.comboBox_ConnectionType->currentData().toString());
+	}
+}
+
+void ZeGotoControlCenter::on_lineEdit_IPAddress_editingFinished()
+{
+	settings.setValue("IPAddress", ui.lineEdit_IPAddress->text());
+}
+
+void ZeGotoControlCenter::on_lineEdit_IPPort_editingFinished()
+{
+	settings.setValue("IPPort", ui.lineEdit_IPPort->text());
 }
 
 void ZeGotoControlCenter::on_pushButton_Connect_clicked()
