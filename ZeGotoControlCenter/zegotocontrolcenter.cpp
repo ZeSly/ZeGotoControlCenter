@@ -100,8 +100,22 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	QTime t = settings.value("PierFlipTime").toTime();
 	ui.timeEdit_PierFlipAlert->setTime(t);
 
-	startASCOMServer();
+	switch (settings.value("PierFlipMode").toInt())
+	{
+	default :
+	case 1 :
+		ui.radioButton_PierFlipAutomatic->setChecked(true);
+		break;
+	case 2 :
+		ui.radioButton_PierFlipManual->setChecked(true);
+		break;
+	case 3 :
+		ui.radioButton_PierFlipPictureFolder->setChecked(true);
+		break;
+	}
+	ui.lineEdit_PierFlipPictureFolder->setText(settings.value("PierFlipPictureFolder").toString());
 
+	startASCOMServer();
 }
 
 ZeGotoControlCenter::~ZeGotoControlCenter()
@@ -139,7 +153,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.groupBox_Tracking->setEnabled(enable);
 	ui.groupBox_ParkActions->setEnabled(enable);
 	ui.comboBox_ParkPositions->setEnabled(enable);
-	ui.pushButton_PierFlipNow->setEnabled(enable);
+	ui.pushButton_PierFlipNow->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)

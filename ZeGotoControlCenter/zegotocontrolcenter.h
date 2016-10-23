@@ -59,6 +59,11 @@ public:
 
 	void on_checkBox_PierFlipAlert_clicked();
 	void on_timeEdit_PierFlipAlert_timeChanged(const QTime &time);
+	void on_radioButton_PierFlipAutomatic_toggled(bool checked);
+	void on_radioButton_PierFlipManual_toggled(bool checked);
+	void on_radioButton_PierFlipPictureFolder_toggled(bool checked);
+	void on_pushButton_PierFlipPictureFolder_clicked();
+	void on_lineEdit_PierFlipPictureFolder_editingFinished();
 
 	void ASCOMConnect();
 	void ASCOMDisconnect();

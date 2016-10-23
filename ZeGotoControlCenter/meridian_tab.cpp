@@ -1,5 +1,7 @@
 #include "zegotocontrolcenter.h"
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 void ZeGotoControlCenter::on_pushButton_PierFlipNow_clicked()
 {
@@ -33,4 +35,55 @@ void ZeGotoControlCenter::on_PierFlipAlertTimer()
 	QString Message = QString("Pier flip will occur in %1 minutes").arg(ui.timeEdit_PierFlipAlert->time().toString("mm:ss"));
 	systrayIcon.show();
 	systrayIcon.showMessage("ZeGoto Control Center", Message, QSystemTrayIcon::Warning);
+}
+
+void ZeGotoControlCenter::on_radioButton_PierFlipAutomatic_toggled(bool checked)
+{
+	if (checked)
+	{
+		settings.setValue("PierFlipMode", 1);
+	}
+}
+
+void ZeGotoControlCenter::on_radioButton_PierFlipManual_toggled(bool checked)
+{
+	if (checked)
+	{
+		settings.setValue("PierFlipMode", 2);
+	}
+
+	if (link != NULL)
+	{
+		ui.pushButton_PierFlipNow->setEnabled(checked);
+	}
+}
+
+void ZeGotoControlCenter::on_radioButton_PierFlipPictureFolder_toggled(bool checked)
+{
+	if (checked)
+	{
+		settings.setValue("PierFlipMode", 3);
+	}
+
+	ui.lineEdit_PierFlipPictureFolder->setEnabled(checked);
+	ui.pushButton_PierFlipPictureFolder->setEnabled(checked);
+}
+
+void ZeGotoControlCenter::on_pushButton_PierFlipPictureFolder_clicked()
+{
+	QString dir = ui.lineEdit_PierFlipPictureFolder->text();
+
+	if (dir.isEmpty())
+	{
+		dir = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0);
+	}
+		
+	dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), dir, QFileDialog::ShowDirsOnly);
+	ui.lineEdit_PierFlipPictureFolder->setText(dir);
+	settings.setValue("PierFlipPictureFolder", dir);
+}
+
+void ZeGotoControlCenter::on_lineEdit_PierFlipPictureFolder_editingFinished()
+{
+	settings.setValue("PierFlipPictureFolder", ui.lineEdit_PierFlipPictureFolder->text());
 }

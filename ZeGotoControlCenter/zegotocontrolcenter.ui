@@ -2288,7 +2288,7 @@ QSlider::handle:vertical:disabled
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabSetup">
        <attribute name="title">
@@ -2339,7 +2339,7 @@ QSlider::handle:vertical:disabled
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>192.168.0.9</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -2365,7 +2365,7 @@ QSlider::handle:vertical:disabled
                 </size>
                </property>
                <property name="text">
-                <string>4030</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -2740,7 +2740,7 @@ to current Alt/Az</string>
           <item>
            <widget class="QGroupBox" name="groupBox_PierPostion">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -2796,16 +2796,6 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="label_PierFlipAlert">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>minutes before</string>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0">
               <widget class="QTimeEdit" name="timeEdit_PierFlipAlert">
                <property name="enabled">
@@ -2820,6 +2810,16 @@ to current Alt/Az</string>
                </property>
                <property name="displayFormat">
                 <string>mm:ss</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_PierFlipAlert">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>minutes before</string>
                </property>
               </widget>
              </item>
@@ -2874,20 +2874,35 @@ to current Alt/Az</string>
               </layout>
              </item>
              <item>
-              <spacer name="verticalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
+              <widget class="QRadioButton" name="radioButton_PierFlipPictureFolder">
+               <property name="text">
+                <string>Synchronize with picture folder</string>
                </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Minimum</enum>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <property name="topMargin">
+                <number>0</number>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_PierFlipPictureFolder">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_PierFlipPictureFolder">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
