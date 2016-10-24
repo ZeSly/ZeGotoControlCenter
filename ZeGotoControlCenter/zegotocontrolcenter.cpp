@@ -91,6 +91,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	QVariant ConnectionType = settings.value("ConnectionType");
 	int s = ui.comboBox_ConnectionType->findData(ConnectionType);
 	ui.comboBox_ConnectionType->setCurrentIndex(s);
+	ui.checkBox_SyncDateTime->setChecked(settings.value("SyncDateTimeWithSystem").toBool());
 
 	bool alert = settings.value("PierFlipAlert").toBool();
 	ui.checkBox_PierFlipAlert->setChecked(alert);
@@ -189,6 +190,11 @@ void ZeGotoControlCenter::on_lineEdit_IPPort_editingFinished()
 	settings.setValue("IPPort", ui.lineEdit_IPPort->text());
 }
 
+void ZeGotoControlCenter::on_checkBox_SyncDateTime_toggled(bool checked)
+{
+	settings.setValue("SyncDateTimeWithSystem", checked);
+}
+
 void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 {
 	if (link != NULL)
@@ -224,6 +230,8 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 
 void ZeGotoControlCenter::linkConnected()
 {
+	Synched = false;
+
 	link->CommandBlind(":U#");       // Switch to high precision
 	link->CommandString(":GVN#");    // Get Telescope Firmware Number
 	link->CommandString(":GVD#");    // Get Telescope Firmware Date
@@ -231,6 +239,8 @@ void ZeGotoControlCenter::linkConnected()
 	link->CommandString(":rM#");     // Get Max Speed
 	link->CommandString(":rS#");     // Get Current Max Speed
 	link->CommandString(":GpH#");    // Get Home Data
+	link->CommandString(":GC#");     // Get Current Date
+	link->CommandString(":GG#");     // Get UTC Offset Time
 
 	ui.pushButton_Connect->setText(tr("Disconnect"));
 	ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-connect.png"));
@@ -245,6 +255,7 @@ void ZeGotoControlCenter::showError(QString msg)
 {
 	QMessageBox::critical(this, tr("Communication error"), msg);
 	TelescopePositionTimer.stop();
+	on_pushButton_Connect_clicked();
 	//delete link;
 	//link = NULL;
 }
@@ -269,12 +280,12 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 
 	else if (strcmp(":GS#", command) == 0)
 	{
-		LocalSideralTime = ParseResponse(response);
+		LocalSideralTime = ParseTime(response);
 		DisplayCoord(response, ui.label_LSTValue, false);
 	}
 	else if (strcmp(":GR#", command) == 0)
 	{
-		RightAscension = ParseResponse(response);
+		RightAscension = ParseTime(response);
 		DisplayCoord(response, ui.label_RAValue, false);
 	}
 	else if (strcmp(":GD#", command) == 0)
@@ -291,8 +302,20 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 	else if (strcmp(":GL#", command) == 0)
 	{
-		UniversalTime = ParseResponse(response);
+		UniversalTime = ParseTime(response);
 		DisplayCoord(response, ui.label_UTCValue, false);
+		if (ui.checkBox_SyncDateTime->isChecked() && !Synched)
+		{
+			SyncDateTimeWithSystem();
+		}
+	}
+	else if (strcmp(":GC#", command) == 0)
+	{
+		MountDate = ParseDate(response);
+	}
+	else if (strcmp(":GG#", command) == 0)
+	{
+		MountUTCOffset = atoi(response);
 	}
 	else if (strcmp(":rM#", command) == 0)
 	{
@@ -357,7 +380,7 @@ void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg)
 	}
 }
 
-QTime ZeGotoControlCenter::ParseResponse(const char * response)
+QTime ZeGotoControlCenter::ParseTime(const char * response)
 {
 	QString r(response);
 
@@ -368,6 +391,19 @@ QTime ZeGotoControlCenter::ParseResponse(const char * response)
 	int second = l[2].toInt();
 
 	return QTime(hour, minute, second);
+}
+
+QDate ZeGotoControlCenter::ParseDate(const char * response)
+{
+	QString r(response);
+
+	r = r.remove('#');
+	QStringList l = r.split('/');
+	int month = l[0].toInt();
+	int day = l[1].toInt();
+	int year = l[2].toInt() + 2000;
+
+	return QDate(year, month, day);
 }
 
 void ZeGotoControlCenter::on_TelescopePositionTime()
@@ -489,4 +525,46 @@ void ZeGotoControlCenter::on_pushButton_TrackingSolar_clicked()
 void ZeGotoControlCenter::on_pushButton_TrackingCustom_clicked()
 {
 	ui.groupBox_Tracking->setTitle(tr("Tracking: custom"));
+}
+
+
+void ZeGotoControlCenter::SyncDateTimeWithSystem()
+{
+	int utcOffset = QDateTime::currentDateTime().utcOffset() / 3600;
+	if (MountUTCOffset != utcOffset)
+	{
+		char cmd[16];
+
+		sprintf(cmd, ":SG%c%02d.0#", utcOffset > 0 ? '+' : '-', utcOffset);
+		link->CommandBool(cmd);
+		link->CommandString(":GG#");
+		qDebug("Sync UTC");
+	}
+	else
+	{
+		QDateTime now = QDateTime::currentDateTimeUtc();
+		if (MountDate != now.date())
+		{
+			QDate today = now.toLocalTime().date();
+			char cmd[16];
+
+			sprintf(cmd, ":SC%02d:%02d:%02d#", today.month(), today.day(), today.year() % 100);
+			link->CommandBool(cmd);
+			qDebug("Sync Date");
+		}
+
+		QTime time = now.time();
+		int s = UniversalTime.secsTo(time);
+		if (abs(s) > 60)
+		{
+			QTime time = now.toLocalTime().time();
+			char cmd[16];
+
+			sprintf(cmd, ":SL%02d:%02d:%02d#", time.hour(), time.minute(), time.second());
+			link->CommandBool(cmd);
+			qDebug("Sync Time");
+		}
+
+		Synched = true;
+	}
 }

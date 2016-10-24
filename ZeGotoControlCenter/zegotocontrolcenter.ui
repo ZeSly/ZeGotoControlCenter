@@ -2288,7 +2288,7 @@ QSlider::handle:vertical:disabled
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSetup">
        <attribute name="title">
@@ -2370,6 +2370,13 @@ QSlider::handle:vertical:disabled
               </widget>
              </item>
             </layout>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBox_SyncDateTime">
+             <property name="text">
+              <string>Synchronize mount date &amp;&amp; time with system time on connect</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

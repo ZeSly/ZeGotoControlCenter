@@ -32,6 +32,7 @@ public:
 	void on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1);
 	void on_lineEdit_IPAddress_editingFinished();
 	void on_lineEdit_IPPort_editingFinished();
+	void on_checkBox_SyncDateTime_toggled(bool checked);
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Expand_clicked();
 	void on_pushButton_Stop_clicked();
@@ -99,8 +100,13 @@ private:
 	QTime LocalSideralTime;
 	QTime UniversalTime;
 	QTime RightAscension;
+	QDate MountDate;
+	int MountUTCOffset;
 
-	QTime ParseResponse(const char * response);
+	QTime ParseTime(const char * response);
+	QDate ParseDate(const char * response);
+	void SyncDateTimeWithSystem();
+	bool Synched;
 };
 
 #endif // ZEGOTOCONTROLCENTER_H
