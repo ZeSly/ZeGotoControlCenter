@@ -177,6 +177,7 @@ copydll.cmd "$(OutDir)"</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="link.cpp" />
+    <ClCompile Include="location_tab.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="meridian_tab.cpp" />
     <ClCompile Include="park_tab.cpp" />

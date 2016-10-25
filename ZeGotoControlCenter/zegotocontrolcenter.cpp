@@ -116,6 +116,8 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	}
 	ui.lineEdit_PierFlipPictureFolder->setText(settings.value("PierFlipPictureFolder").toString());
 
+	ui.pushButton_GPS_OnOff->setDown(true);
+
 	startASCOMServer();
 }
 
@@ -155,6 +157,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.groupBox_ParkActions->setEnabled(enable);
 	ui.comboBox_ParkPositions->setEnabled(enable);
 	ui.pushButton_PierFlipNow->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
+	ui.pushButton_GPS_OnOff->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -207,6 +210,7 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 
 		ui.pushButton_Connect->setText(tr("Connect"));
 		ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
+		ui.pushButton_Connect->setDown(false);
 	}
 	else
 	{
@@ -244,6 +248,7 @@ void ZeGotoControlCenter::linkConnected()
 
 	ui.pushButton_Connect->setText(tr("Disconnect"));
 	ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-connect.png"));
+	ui.pushButton_Connect->setDown(true);
 	setConnectedWidgetEnabled(true);
 	ui.groupBox_Tracking->setTitle(tr("Tracking: sideral"));
 

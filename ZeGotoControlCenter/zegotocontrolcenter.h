@@ -66,6 +66,8 @@ public:
 	void on_pushButton_PierFlipPictureFolder_clicked();
 	void on_lineEdit_PierFlipPictureFolder_editingFinished();
 
+	void on_pushButton_GPS_OnOff_clicked();
+
 	void ASCOMConnect();
 	void ASCOMDisconnect();
 	void ASCOMReadCommand();
