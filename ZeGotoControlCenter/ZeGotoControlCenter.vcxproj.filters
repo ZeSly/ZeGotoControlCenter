@@ -102,12 +102,16 @@
     <ClInclude Include="GeneratedFiles\ui_zegotocontrolcenter.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="build_number.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="build_number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ZeGotoControlCenter.ico" />
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZeGotoControlCenter.rc" />

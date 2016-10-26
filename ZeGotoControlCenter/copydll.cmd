@@ -10,3 +10,4 @@ rem copy /Y "%QTDIR%\bin\libEGL.dll" %1
 copy /Y "%QTDIR%\bin\libGLESv2.dll" %1
 if not exist %1\platforms mkdir %1\platforms
 copy /Y "%QTDIR%\plugins\platforms\qwindows.dll" %1\platforms
+build_number.cmd
