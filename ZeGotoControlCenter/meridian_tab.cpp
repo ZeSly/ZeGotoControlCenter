@@ -32,7 +32,7 @@ void ZeGotoControlCenter::on_timeEdit_PierFlipAlert_timeChanged(const QTime &tim
 
 void ZeGotoControlCenter::on_PierFlipAlertTimer()
 {
-	QString Message = QString("Pier flip will occur in %1 minutes").arg(ui.timeEdit_PierFlipAlert->time().toString("mm:ss"));
+	QString Message = QString(tr("Pier flip will occur in %1 minutes")).arg(ui.timeEdit_PierFlipAlert->time().toString("mm:ss"));
 	systrayIcon.show();
 	systrayIcon.showMessage("ZeGoto Control Center", Message, QSystemTrayIcon::Warning);
 }
@@ -55,6 +55,7 @@ void ZeGotoControlCenter::on_radioButton_PierFlipManual_toggled(bool checked)
 	if (link != NULL)
 	{
 		ui.pushButton_PierFlipNow->setEnabled(checked);
+		ui.comboBox_ManualSideOfPier->setEnabled(checked);
 	}
 }
 
@@ -86,4 +87,41 @@ void ZeGotoControlCenter::on_pushButton_PierFlipPictureFolder_clicked()
 void ZeGotoControlCenter::on_lineEdit_PierFlipPictureFolder_editingFinished()
 {
 	settings.setValue("PierFlipPictureFolder", ui.lineEdit_PierFlipPictureFolder->text());
+}
+
+void ZeGotoControlCenter::on_comboBox_ManualSideOfPier_currentIndexChanged(int index)
+{
+	if (link != NULL)
+	{
+		if (index == 0)
+		{
+			link->Command(":psE#");
+		}
+		else
+		{
+			link->Command(":psW#");
+		}
+	}
+}
+
+void ZeGotoControlCenter::on_radioButton_PierFlipAutomatic_clicked()
+{
+	if (link != NULL)
+	{
+		if (ui.radioButton_PierFlipAutomatic->isChecked())
+		{
+			link->Command(":psA#");
+		}
+		else
+		{
+			if (PierSide == EAST)
+			{
+				link->Command(":psE#");
+			}
+			else
+			{
+				link->Command(":psW#");
+			}
+		}
+	}
 }

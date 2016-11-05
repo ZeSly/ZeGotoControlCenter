@@ -115,6 +115,8 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		break;
 	}
 	ui.lineEdit_PierFlipPictureFolder->setText(settings.value("PierFlipPictureFolder").toString());
+	ui.comboBox_ManualSideOfPier->addItem(tr("East"));
+	ui.comboBox_ManualSideOfPier->addItem(tr("West"));
 
 	ui.pushButton_GPS_OnOff->setDown(true);
 
@@ -157,7 +159,9 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.groupBox_ParkActions->setEnabled(enable);
 	ui.comboBox_ParkPositions->setEnabled(enable);
 	ui.pushButton_PierFlipNow->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
+	ui.comboBox_ManualSideOfPier->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
 	ui.pushButton_GPS_OnOff->setEnabled(enable);
+	ui.pushButton_StopMonitor->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -291,6 +295,26 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	else if (strcmp(":GR#", command) == 0)
 	{
 		RightAscension = ParseTime(response);
+		double ra = (double)(LocalSideralTime.msecsSinceStartOfDay() - RightAscension.msecsSinceStartOfDay()) / 3600000.0;
+
+		if (ra < 0) ra += 24.0;
+		if (ra > 18.0)
+		{
+			ui.label_SideOfPierValue->setText(tr("West"));
+		}
+		else if (ra > 12)
+		{
+			ui.label_SideOfPierValue->setText(tr("West"));
+		}
+		else if (ra > 6)
+		{
+			ui.label_SideOfPierValue->setText(tr("East"));
+		}
+		else
+		{
+			ui.label_SideOfPierValue->setText(tr("East"));
+		}
+
 		DisplayCoord(response, ui.label_RAValue, false);
 	}
 	else if (strcmp(":GD#", command) == 0)
@@ -338,14 +362,31 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		QString side_of_pier = QString(response).remove('#');
 		ui.label_PierSideValue->setText(side_of_pier);
-		ui.label_SideOfPierValue->setText(side_of_pier);
+		if (side_of_pier == "West")
+		{
+			PierSide = WEST;
+		}
+		else
+		{
+			PierSide = EAST;
+		}
 	}
 	else if (strcmp(":GpH#", command) == 0)
 	{
 		setComboParkPosition(response);
 	}
 
-	int flip_in_secs = RightAscension.secsTo(LocalSideralTime);
+	int flip_in_secs;
+	if (PierSide == EAST)
+	{
+		flip_in_secs = LocalSideralTime.addSecs(43200).secsTo(RightAscension);
+	}
+	else
+	{
+		flip_in_secs = LocalSideralTime.secsTo(RightAscension);
+	}
+	
+	if (flip_in_secs < 0) flip_in_secs += 86400;
 	QTime flip_in = QTime::fromMSecsSinceStartOfDay(flip_in_secs * 1000);
 
 	ui.label_FlipInValue->setText(flip_in.toString("h 'h' mm 'm' ss 's'"));
@@ -440,6 +481,20 @@ void ZeGotoControlCenter::on_pushButton_Expand_clicked()
 		ui.tabWidget->setVisible(true);
 		this->setFixedSize(800, h);
 		ui.pushButton_Expand->setText("<<<");
+	}
+}
+
+void ZeGotoControlCenter::on_pushButton_StopMonitor_clicked()
+{
+	if (ui.pushButton_StopMonitor->isChecked())
+	{
+		TelescopePositionTimer.stop();
+		ui.pushButton_StopMonitor->setDown(true);
+	}
+	else
+	{
+		TelescopePositionTimer.start(1000);
+		ui.pushButton_StopMonitor->setDown(false);
 	}
 }
 

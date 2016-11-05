@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>804</width>
-    <height>533</height>
+    <height>549</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,14 +17,11 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>OpenGoto Control Center</string>
+   <string>ZeGoto Control Center</string>
   </property>
   <property name="windowIcon">
    <iconset resource="zegotocontrolcenter.qrc">
     <normaloff>:/Images/Resources/em200_32.png</normaloff>:/Images/Resources/em200_32.png</iconset>
-  </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget
@@ -88,7 +85,7 @@ QPushButton:default
     color: #ccc;
 }*/
  
-QLabel#label_LSTValue, #label_RAValue, #label_DECValue, #label_ALTValue, #label_AZValue, #label_UTCValue, #label_PierSideValue, #label_GPS_Latitude_Value, #label_GPS_Longitude_Value, #label_GPS_Elevation_Value, #label_GPS_FixIndicator_Value, #label_GPS_UTC_Time_Value, #label_GPS_Satellites_Value
+QLabel#label_LSTValue, #label_RAValue, #label_DECValue, #label_ALTValue, #label_AZValue, #label_UTCValue, #label_PierSideValue, #label_GPS_Latitude_Value, #label_GPS_Longitude_Value, #label_GPS_Elevation_Value, #label_GPS_FixIndicator_Value, #label_GPS_UTC_Time_Value, #label_GPS_Satellites_Value, #label_SideOfPierValue, #label_FlipInValue
 {
     background-color: #500;
     color: #ff0;
@@ -1673,6 +1670,16 @@ QSlider::handle:vertical:disabled
            </property>
           </widget>
          </item>
+         <item row="7" column="1">
+          <widget class="QPushButton" name="pushButton_StopMonitor">
+           <property name="text">
+            <string>Stop Monitoring</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -2288,7 +2295,7 @@ QSlider::handle:vertical:disabled
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabSetup">
        <attribute name="title">
@@ -2750,9 +2757,9 @@ to current Alt/Az</string>
             </property>
             <layout class="QFormLayout" name="formLayout_4">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_SideOfPier">
+              <widget class="QLabel" name="label_RegularSideOfPier">
                <property name="text">
-                <string>Side of pier :</string>
+                <string>Regular side of pier :</string>
                </property>
               </widget>
              </item>
@@ -2862,14 +2869,25 @@ to current Alt/Az</string>
                 </layout>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButton_PierFlipNow">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Flip now</string>
-                 </property>
-                </widget>
+                <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <item>
+                  <widget class="QPushButton" name="pushButton_PierFlipNow">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Flip now</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_ManualSideOfPier">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </item>

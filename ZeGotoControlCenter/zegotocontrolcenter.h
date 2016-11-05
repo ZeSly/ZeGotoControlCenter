@@ -35,6 +35,7 @@ public:
 	void on_checkBox_SyncDateTime_toggled(bool checked);
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Expand_clicked();
+	void on_pushButton_StopMonitor_clicked();
 	void on_pushButton_Stop_clicked();
 	void on_pushButton_North_pressed();
 	void on_pushButton_North_released();
@@ -65,6 +66,8 @@ public:
 	void on_radioButton_PierFlipPictureFolder_toggled(bool checked);
 	void on_pushButton_PierFlipPictureFolder_clicked();
 	void on_lineEdit_PierFlipPictureFolder_editingFinished();
+	void on_comboBox_ManualSideOfPier_currentIndexChanged(int index);
+	void on_radioButton_PierFlipAutomatic_clicked();
 
 	void on_pushButton_GPS_OnOff_clicked();
 
@@ -109,6 +112,13 @@ private:
 	QDate ParseDate(const char * response);
 	void SyncDateTimeWithSystem();
 	bool Synched;
+
+	enum T_PierSide
+	{
+		EAST,
+		WEST
+	};
+	T_PierSide PierSide;
 };
 
 #endif // ZEGOTOCONTROLCENTER_H
