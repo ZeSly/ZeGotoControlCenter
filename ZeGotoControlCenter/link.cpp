@@ -30,7 +30,7 @@ Link::T_TypeCommand Link::TypesCommand[] =
     { ":Mgn", LINK_TYPE_BLIND },
     { ":Mgs", LINK_TYPE_BLIND },
     { ":Mgw", LINK_TYPE_BLIND },
-    { ":MS", LINK_TYPE_BOOL },
+    { ":MS", LINK_TYPE_STRING },
     { ":RC", LINK_TYPE_BLIND },
     { ":RG", LINK_TYPE_BLIND },
     { ":RM", LINK_TYPE_BLIND },
