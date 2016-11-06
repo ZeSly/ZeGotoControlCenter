@@ -1118,7 +1118,7 @@ namespace ASCOM.ZeGoto
                     {
                         utilities.WaitForMilliseconds(200);
                         resp  = this.CommandString("MS", false);                        
-                        if (resp[0] != 0)  // Failed to start slew
+                        if (resp[0] != '0')  // Failed to start slew
                         {
                             SharedResources.Slewing = false; // Clear slewing flag
                             m_bStartingSlew = false;
