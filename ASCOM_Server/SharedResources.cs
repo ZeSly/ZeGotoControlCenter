@@ -183,6 +183,17 @@ namespace ASCOM.ZeGoto
                 return false;
         }
 
+        public static bool isParked;
+        public static bool LongFormat;
+        public static string RADelimHrs;
+        public static string RADelimMin;
+        public static string RADelimSec;
+        public static string DecDelimDeg;
+        public static string DecDelimMin;
+        public static string DecDelimSec;
+        public static bool AbortSlew;
+        public static bool Slewing;
+
         #endregion
 
     }

@@ -101,8 +101,7 @@ namespace ASCOM.ZeGoto
         internal static double elevation;
 
         internal static UInt32 maxRate;
-        internal static int parkPosition;
-        internal static bool isParked;
+        internal static int parkPosition;        
         
         internal static bool traceState;
 
@@ -133,6 +132,8 @@ namespace ASCOM.ZeGoto
         // This uses runtime-generated messages
         public static string MSG_BELOW_HORIZ = "The selected coordinates are below the horizon.";
         public static string MSG_BELOW_MIN_EL = "The selected coordinates are below the current minimum elevation setting.";
+        public static string MSG_SLEWING = "The mount is slewin.";
+        public static string MSG_PARKED = "The mount is parked.";
         public static string MSG_SLEW_FAIL = "The slew failed for some unknown reason.";
         public static string MSG_SETUP_CONNECTED = "You cannot change the driver's configuration while it is connected to a telescope.";
         public static string MSG_PROPNOTSET = " property has not yet been set.";
@@ -143,24 +144,15 @@ namespace ASCOM.ZeGoto
         //
         private double m_dPrevRA;
         private double m_dPrevDec;
-        private bool m_bAbortSlew;
         private double m_dRARes;           // degrees 
         private double m_dDecRes;          // degrees 
-        private bool m_bSlewing;
         private bool m_bStartingSlew;    // Super ugly!
         private int m_lAsyncEndTix;
-        private bool m_bLongFormat;
         private short m_iSettleTime;
         private double m_dTargetRA;
         private bool m_bTargetRAValid;
         private double m_dTargetDec;
         private bool m_bTargetDecValid;
-        private string m_sRADelimHrs;
-        private string m_sRADelimMin;
-        private string m_sRADelimSec;
-        private string m_sDecDelimDeg;
-        private string m_sDecDelimMin;
-        private string m_sDecDelimSec;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ZeGoto"/> class.
@@ -172,14 +164,19 @@ namespace ASCOM.ZeGoto
 
             ReadProfile(); // Read device configuration from the ASCOM Profile store
 
+            //#if DEBUG
+            //            string d = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\ASCOM.ZeGoto.log";
+            //            tl = new TraceLogger(d, "ZeGoto");
+            //#else
             tl = new TraceLogger("", "ZeGoto");
+            //#endif
             tl.Enabled = traceState;
             tl.LogMessage("Telescope", "Starting initialisation");
 
             utilities = new Util(); //Initialise util object
             //SharedResources.SharedLink = new SerialOrSocket();
 
-            isParked = true;
+            SharedResources.isParked = false;
             tl.LogMessage("Telescope", "Completed initialisation");
         }
 
@@ -188,7 +185,7 @@ namespace ASCOM.ZeGoto
         // PUBLIC COM INTERFACE ITelescopeV3 IMPLEMENTATION
         //
 
-        #region Common properties and methods.
+#region Common properties and methods.
 
         /// <summary>
         /// Displays the Setup Dialog form.
@@ -318,7 +315,11 @@ namespace ASCOM.ZeGoto
             {
                 tl.LogMessage("Connected Set", value.ToString());
                 if (value == IsConnected)
+                {
+                    tl.LogMessage("Already connected", "");
+                    tl.LogMessage("LongFormat = ", SharedResources.LongFormat.ToString());
                     return;
+                }
 
                 if (value)
                 {
@@ -331,6 +332,7 @@ namespace ASCOM.ZeGoto
                     // 1) Set up the communications SharedResources.SharedLink.
                     if (!SharedResources.Connected)
                     {
+                        tl.LogMessage("Connected Set", "Connecting... " + comPort);
                         if (comPort == "TCP/IP")
                         {
                             SharedResources.SharedLink.IPAddress = ipAddress;
@@ -412,14 +414,14 @@ namespace ASCOM.ZeGoto
 
                     // 3) Final timeout & try for long format.
                     SharedResources.SharedLink.ReceiveTimeout = 10;   // Switch to 10 sec timeout
-                    m_bLongFormat = SetLongFormat(true);                // Try for long format
+                    SharedResources.LongFormat = true;   // SetLongFormat(true);                // Try for long format
                     //
                     // (4) Initialize slew detection parameters. The registry values may be
                     //     missing if the SetupDialog() had not yet been used. We default
                     //     to 60 arcsec. Avoid use of decimal values for international use.
                     //
-                    m_bSlewing = false;
-                    m_bAbortSlew = false;
+                    SharedResources.Slewing = false;
+                    SharedResources.AbortSlew = false;
                     m_dRARes = 60 / 3600;
                     m_dDecRes = 60 / 3600;
                     //
@@ -432,28 +434,35 @@ namespace ASCOM.ZeGoto
                     m_dPrevDec = utilities.DMSToDegrees(sDec);
                     rx = new Regex(@"[\+\-]*[0-9\.]+([^0-9\.]+)[0-9\.]*([^0-9\.]*)[0-9\.]*([^0-9\.]*)");
                     mt = rx.Matches(sRA);
-                    m_sRADelimHrs = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
-                    if (m_bLongFormat)
+                    SharedResources.RADelimHrs = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
+                    tl.LogMessage("LongFormat = ", SharedResources.LongFormat.ToString());
+                    if (SharedResources.LongFormat)
                     {
-                        m_sRADelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
-                        m_sRADelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
+                        SharedResources.RADelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
+                        SharedResources.RADelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
+                        tl.LogMessage("SharedResources.RADelimMin = ", SharedResources.RADelimMin.ToString());
+                        tl.LogMessage("SharedResources.RADelimSec = ", SharedResources.RADelimSec.ToString());
                     }
                     else
                     {
-                        m_sRADelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
-                        m_sRADelimSec = "";
+                        SharedResources.RADelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
+                        SharedResources.RADelimSec = "";
+                        tl.LogMessage("SharedResources.RADelimMin = ", SharedResources.RADelimMin.ToString());
                     }
                     mt = rx.Matches(sDec);
-                    m_sDecDelimDeg = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
-                    if (m_bLongFormat)
+                    SharedResources.DecDelimDeg = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
+                    if (SharedResources.LongFormat)
                     {
-                        m_sDecDelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
-                        m_sDecDelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
+                        SharedResources.DecDelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
+                        SharedResources.DecDelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
+                        tl.LogMessage("SharedResources.DecDelimMin = ", SharedResources.DecDelimMin.ToString());
+                        tl.LogMessage("SharedResources.DecDelimSec = ", SharedResources.DecDelimSec.ToString());
                     }
                     else
                     {
-                        m_sDecDelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
-                        m_sDecDelimSec = "";
+                        SharedResources.DecDelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
+                        SharedResources.DecDelimSec = "";
+                        tl.LogMessage("SharedResources.DecDelimMin = ", SharedResources.DecDelimMin.ToString());
                     } 
                     
                     tl.LogMessage("Connected Set", "Connected to port " + comPort);
@@ -463,7 +472,7 @@ namespace ASCOM.ZeGoto
                     tl.LogMessage("Connected Set", "Disconnecting...");
 
                     if (SharedResources.Connected) this.CommandBlind("Q", false);    // Stop all motion
-                    m_bSlewing = false; // No longer slewing
+                    SharedResources.Slewing = false; // No longer slewing
                     if (SharedResources.Connected) SetLongFormat(false);
                     SharedResources.SharedLink.ClearBuffers();    // Clear serial buffers
                     SharedResources.Connected = false;
@@ -546,14 +555,14 @@ namespace ASCOM.ZeGoto
             }
         }
 
-        #endregion
+#endregion
 
-        #region ITelescope Implementation
+#region ITelescope Implementation
         public void AbortSlew()
         {
             tl.LogMessage("AbortSlew", "");
             this.CommandBlind("Q", false);                             // Halt the slew
-            m_bAbortSlew = true;                                // Raise the abort flag
+            SharedResources.AbortSlew = true;                                // Raise the abort flag
         }
 
         public AlignmentModes AlignmentMode
@@ -624,8 +633,8 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                tl.LogMessage("AtPark", "Get - " + isParked.ToString());
-                return isParked;
+                tl.LogMessage("AtPark", "Get - " + SharedResources.isParked.ToString());
+                return SharedResources.isParked;
             }
         }
 
@@ -793,7 +802,7 @@ namespace ASCOM.ZeGoto
         {
             CommandBlind("hP", false);
             tl.LogMessage("Park", "");
-            isParked = true;
+            SharedResources.isParked = true;
         }
 
         public void PulseGuide(GuideDirections Direction, int Duration)
@@ -1087,7 +1096,7 @@ namespace ASCOM.ZeGoto
             int tmo;
 
             CheckConnected("SlewToTargetAsync");
-            m_bAbortSlew = false;
+            SharedResources.AbortSlew = false;
             m_bStartingSlew = true; // We're TRYING to get the thing to slew...
             //
             // This is where all the work is done for slewing. The other
@@ -1111,6 +1120,8 @@ namespace ASCOM.ZeGoto
                         resp  = this.CommandString("MS", false);                        
                         if (resp[0] != 0)  // Failed to start slew
                         {
+                            SharedResources.Slewing = false; // Clear slewing flag
+                            m_bStartingSlew = false;
                             switch (resp[0])
                             {
                                 case '1':    // Below horizon
@@ -1119,12 +1130,18 @@ namespace ASCOM.ZeGoto
                                 case '2':    // Below minimum elevation
                                     msg = MSG_BELOW_MIN_EL;
                                     break;
+                                case '3':   // Mount is slewing
+                                    SharedResources.Slewing = true;
+                                    msg = MSG_SLEWING;
+                                    break;
+                                case '4':   // Mount is parked
+                                    SharedResources.isParked = true;
+                                    msg = MSG_PARKED;
+                                    break;
                                 default:
                                     msg = MSG_SLEW_FAIL;
                                     break;
                             }
-                            m_bSlewing = false; // Clear slewing flag
-                            m_bStartingSlew = false;
                             SharedResources.SharedLink.ReceiveTimeout = tmo;  // Restore tithisout
                             throw new InvalidOperationException(msg); // FAILED
                         }
@@ -1141,15 +1158,15 @@ namespace ASCOM.ZeGoto
                 if (i <= 6) // Success
                 {
                     m_lAsyncEndTix = GetTickCount() + ((int)(m_iSettleTime + 4) * 1000);
-                    m_bSlewing = true;  // But still say we're slewing
+                    SharedResources.Slewing = true;  // But still say we're slewing
                     m_bStartingSlew = false;
                     return; // Succeeded
                 }
-                m_bSlewing = false;
+                SharedResources.Slewing = false;
                 m_bStartingSlew = false;
                 throw new InvalidOperationException(MSG_SLEW_FAIL); // Failed!
             }
-            m_bSlewing = false; // Too small to slew
+            SharedResources.Slewing = false; // Too small to slew
             m_bStartingSlew = false;
 
             tl.LogMessage("SlewToTargetAsync", "");
@@ -1162,7 +1179,7 @@ namespace ASCOM.ZeGoto
                 bool bMoving;
                 double RA, Dec;
 
-                if (!m_bSlewing)        // Short-circuit when not slewing
+                if (!SharedResources.Slewing)        // Short-circuit when not slewing
                 {
                     return false;       // No slew now
                 }
@@ -1191,14 +1208,14 @@ namespace ASCOM.ZeGoto
                     m_dPrevDec = Dec;
                 }
 
-                if (!m_bAbortSlew && bMoving)
+                if (!SharedResources.AbortSlew && bMoving)
                 {
                     //
                     // This adds settle time after we see that the scope has
                     // not moved one arcmin.
                     //
                     m_lAsyncEndTix = GetTickCount() + ((int)(m_iSettleTime) * 1000);
-                    m_bSlewing = true;
+                    SharedResources.Slewing = true;
                 }
                 else
                 {
@@ -1206,23 +1223,23 @@ namespace ASCOM.ZeGoto
                     // This implements the trailing settle time
                     // (skip it on a slew abort)
                     //
-                    if (m_bAbortSlew || (GetTickCount() > m_lAsyncEndTix))
+                    if (SharedResources.AbortSlew || (GetTickCount() > m_lAsyncEndTix))
                     {
                         this.CommandBlind("Q", false);   // Force the scope to stop (FS2 buglet)
-                        m_bSlewing = false;
-                        m_bAbortSlew = false;
+                        SharedResources.Slewing = false;
+                        SharedResources.AbortSlew = false;
                         System.Media.SystemSounds.Exclamation.Play();
                         //System.Media.SoundPlayer bibip = new System.Media.SoundPlayer(@"c:\Windows\Media\tada.wav");
                         //bibip.Play();
                     }
                     else
                     {
-                        m_bSlewing = true;
+                        SharedResources.Slewing = true;
                     }
                 }
 
                 tl.LogMessage("Slewing Get", "");
-                return m_bSlewing;
+                return SharedResources.Slewing;
 
             }
         }
@@ -1267,13 +1284,15 @@ namespace ASCOM.ZeGoto
 
                 CheckConnected("TargetRightAscension");
                 if (value < -90.0 || value > 90.0) throw new InvalidOperationException(MSG_PROP_RANGE_ERROR);
-                if (!m_bLongFormat)
+                if (!SharedResources.LongFormat)
                 {
-                    sexa = utilities.DegreesToDM(value, m_sDecDelimDeg, m_sDecDelimMin, 1);    // Short format, 1 decimal digit
+                    sexa = utilities.DegreesToDM(value, SharedResources.DecDelimDeg, SharedResources.DecDelimMin, 1);    // Short format, 1 decimal digit
+                    tl.LogMessage("TargetDeclination Set short ", sexa);
                 }
                 else
                 {
-                    sexa = utilities.DegreesToDMS(value, m_sDecDelimDeg, m_sDecDelimMin, m_sDecDelimSec, 0);  // Long format, whole seconds
+                    sexa = utilities.DegreesToDMS(value, SharedResources.DecDelimDeg, SharedResources.DecDelimMin, SharedResources.DecDelimSec, 0);  // Long format, whole seconds
+                    tl.LogMessage("TargetDeclination Set long ", sexa);
                 }
 
                 if (sexa.Substring(0, 1) != "-") sexa = "+" + sexa;  // Both need leading '+'
@@ -1308,13 +1327,13 @@ namespace ASCOM.ZeGoto
 
                 CheckConnected("TargetRightAscension");
                 if (value < 0.0 || value >= 24.0) throw new InvalidOperationException(MSG_PROP_RANGE_ERROR);
-                if (!m_bLongFormat)
+                if (!SharedResources.LongFormat)
                 {
-                    sexa = utilities.HoursToHM(value, m_sRADelimHrs, m_sRADelimMin, 1);    // Short format, 1 decimal digit
+                    sexa = utilities.HoursToHM(value, SharedResources.RADelimHrs, SharedResources.RADelimMin, 1);    // Short format, 1 decimal digit
                 }
                 else
                 {
-                    sexa = utilities.HoursToHMS(value, m_sRADelimHrs, m_sRADelimMin, m_sRADelimSec, 0);   // Long format, whole seconds
+                    sexa = utilities.HoursToHMS(value, SharedResources.RADelimHrs, SharedResources.RADelimMin, SharedResources.RADelimSec, 0);   // Long format, whole seconds
                 }
 
                 if (!this.CommandBool("Sr" + sexa, false))
@@ -1327,6 +1346,7 @@ namespace ASCOM.ZeGoto
                 m_bTargetRAValid = true;
 
                 tl.LogMessage("TargetRightAscension Set", value.ToString());
+                tl.LogMessage("TargetRightAscension Set", sexa);
             }
         }
 
@@ -1393,16 +1413,16 @@ namespace ASCOM.ZeGoto
         {
             CommandBlind("hW", false);
             tl.LogMessage("Unpark", "");
-            isParked = false;
+            SharedResources.isParked = false;
         }
 
-        #endregion
+#endregion
 
-        #region Private properties and methods
+#region Private properties and methods
         // here are some useful properties and methods that can be used as required
         // to help with driver development
 
-        #region ASCOM Registration
+#region ASCOM Registration
 
         //// Register or unregister driver for ASCOM. This is harmless if already
         //// registered or unregistered. 
@@ -1474,7 +1494,7 @@ namespace ASCOM.ZeGoto
         //    RegUnregASCOM(false);
         //}
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Returns true if there is a valid connection to the driver hardware
@@ -1516,7 +1536,7 @@ namespace ASCOM.ZeGoto
                 focalLength = Convert.ToDouble(driverProfile.GetValue(driverID, "FocalLength", string.Empty, "0"));
                 apertureArea = 3.1415926535897932384626433832795 * Math.Pow(apertureDiameter / 2, 2);
 
-                useGPS = Convert.ToBoolean(driverProfile.GetValue(driverID, "UseGPS", string.Empty, false.ToString()));
+                useGPS = Convert.ToBoolean(driverProfile.GetValue(driverID, "UseGPS", string.Empty, true.ToString()));
                 latitude = Convert.ToDouble(driverProfile.GetValue(driverID, "Latitude", string.Empty, "0"));
                 longitude = Convert.ToDouble(driverProfile.GetValue(driverID, "Longitude", string.Empty, "0"));
                 elevation = Convert.ToDouble(driverProfile.GetValue(driverID, "Elevation", string.Empty, "0"));
@@ -1646,7 +1666,7 @@ namespace ASCOM.ZeGoto
             return d;
         }
 
-        #endregion
+#endregion
 
     }
 }
