@@ -256,6 +256,22 @@ void ZeGotoControlCenter::linkConnected()
 	setConnectedWidgetEnabled(true);
 	ui.groupBox_Tracking->setTitle(tr("Tracking: sideral"));
 
+	if (ui.radioButton_PierFlipAutomatic->isChecked())
+	{
+		link->Command(":psA#");
+	}
+	else
+	{
+		if (PierSide == EAST)
+		{
+			link->Command(":psE#");
+		}
+		else
+		{
+			link->Command(":psW#");
+		}
+	}
+
 	on_TelescopePositionTime();
 	TelescopePositionTimer.start(1000);
 }
@@ -300,19 +316,19 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		if (ra < 0) ra += 24.0;
 		if (ra > 18.0)
 		{
-			ui.label_SideOfPierValue->setText(tr("West"));
+			ui.label_SideOfPierValue->setText(tr("The scope is on WEST side of mount,\nSide of pier is WEST"));
 		}
 		else if (ra > 12)
 		{
-			ui.label_SideOfPierValue->setText(tr("West"));
+			ui.label_SideOfPierValue->setText(tr("The scope is on EAST side of mount,\nSide of pier is WEST"));
 		}
 		else if (ra > 6)
 		{
-			ui.label_SideOfPierValue->setText(tr("East"));
+			ui.label_SideOfPierValue->setText(tr("The scope is on WEST side of mount,\nSide of pier is EAST"));
 		}
 		else
 		{
-			ui.label_SideOfPierValue->setText(tr("East"));
+			ui.label_SideOfPierValue->setText(tr("The scope is on EAST side of mount,\nSide of pier is EAST"));
 		}
 
 		DisplayCoord(response, ui.label_RAValue, false);
@@ -365,10 +381,12 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		if (side_of_pier == "West")
 		{
 			PierSide = WEST;
+			ui.comboBox_ManualSideOfPier->setCurrentIndex(1);
 		}
 		else
 		{
 			PierSide = EAST;
+			ui.comboBox_ManualSideOfPier->setCurrentIndex(0);
 		}
 	}
 	else if (strcmp(":GpH#", command) == 0)

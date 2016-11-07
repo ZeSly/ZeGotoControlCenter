@@ -67,7 +67,6 @@ public:
 	void on_pushButton_PierFlipPictureFolder_clicked();
 	void on_lineEdit_PierFlipPictureFolder_editingFinished();
 	void on_comboBox_ManualSideOfPier_currentIndexChanged(int index);
-	void on_radioButton_PierFlipAutomatic_clicked();
 
 	void on_pushButton_GPS_OnOff_clicked();
 

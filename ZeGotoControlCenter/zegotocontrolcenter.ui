@@ -2295,7 +2295,7 @@ QSlider::handle:vertical:disabled
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSetup">
        <attribute name="title">
@@ -2756,34 +2756,14 @@ to current Alt/Az</string>
              <string>Pier position</string>
             </property>
             <layout class="QFormLayout" name="formLayout_4">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_RegularSideOfPier">
-               <property name="text">
-                <string>Regular side of pier :</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="label_SideOfPierValue">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="label_FlipIn">
                <property name="text">
                 <string>Flip in :</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QLabel" name="label_FlipInValue">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -2796,14 +2776,14 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="3" column="0" colspan="2">
               <widget class="QCheckBox" name="checkBox_PierFlipAlert">
                <property name="text">
                 <string>Alert</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QTimeEdit" name="timeEdit_PierFlipAlert">
                <property name="enabled">
                 <bool>false</bool>
@@ -2820,13 +2800,33 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QLabel" name="label_PierFlipAlert">
                <property name="enabled">
                 <bool>false</bool>
                </property>
                <property name="text">
                 <string>minutes before</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="label_SideOfPierValue">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="label_RegularSideOfPier">
+               <property name="text">
+                <string>With counterweight shaft pointing down :</string>
                </property>
               </widget>
              </item>

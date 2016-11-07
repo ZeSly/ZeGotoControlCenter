@@ -42,6 +42,10 @@ void ZeGotoControlCenter::on_radioButton_PierFlipAutomatic_toggled(bool checked)
 	if (checked)
 	{
 		settings.setValue("PierFlipMode", 1);
+		if (link != NULL)
+		{
+			link->Command(":psA#");
+		}
 	}
 }
 
@@ -50,6 +54,17 @@ void ZeGotoControlCenter::on_radioButton_PierFlipManual_toggled(bool checked)
 	if (checked)
 	{
 		settings.setValue("PierFlipMode", 2);
+		if (link != NULL)
+		{
+			if (PierSide == EAST)
+			{
+				link->Command(":psE#");
+			}
+			else
+			{
+				link->Command(":psW#");
+			}
+		}
 	}
 
 	if (link != NULL)
@@ -64,6 +79,17 @@ void ZeGotoControlCenter::on_radioButton_PierFlipPictureFolder_toggled(bool chec
 	if (checked)
 	{
 		settings.setValue("PierFlipMode", 3);
+		if (link != NULL)
+		{
+			if (PierSide == EAST)
+			{
+				link->Command(":psE#");
+			}
+			else
+			{
+				link->Command(":psW#");
+			}
+		}
 	}
 
 	ui.lineEdit_PierFlipPictureFolder->setEnabled(checked);
@@ -100,28 +126,6 @@ void ZeGotoControlCenter::on_comboBox_ManualSideOfPier_currentIndexChanged(int i
 		else
 		{
 			link->Command(":psW#");
-		}
-	}
-}
-
-void ZeGotoControlCenter::on_radioButton_PierFlipAutomatic_clicked()
-{
-	if (link != NULL)
-	{
-		if (ui.radioButton_PierFlipAutomatic->isChecked())
-		{
-			link->Command(":psA#");
-		}
-		else
-		{
-			if (PierSide == EAST)
-			{
-				link->Command(":psE#");
-			}
-			else
-			{
-				link->Command(":psW#");
-			}
 		}
 	}
 }
