@@ -393,6 +393,19 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		setComboParkPosition(response);
 	}
+	else if (strcmp(":Gg#", command) == 0)
+	{
+		DisplayCoord(response, ui.label_GPS_Longitude_Value, true, 2);
+	}
+	else if (strcmp(":Gt#", command) == 0)
+	{
+		DisplayCoord(response, ui.label_GPS_Latitude_Value, true, 1);
+	}
+	else if (strcmp(":Gu#", command) == 0)
+	{
+		int elevation = atoi(response);
+		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(elevation));
+	}
 
 	int flip_in_secs;
 	if (PierSide == EAST)
@@ -417,7 +430,7 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 }
 
-void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg)
+void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg, int geo)
 {
 	QString r(s);
 
@@ -429,9 +442,28 @@ void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg)
 
 	if (deg)
 	{
+		QString positive, negative;
+
+		switch (geo)
+		{
+		case 0:
+			positive = "+";
+			negative = "-";
+			break;
+		case 1:
+			positive = tr("N ");
+			negative = tr("S ");
+			break;
+		case 2 :
+			positive = tr("W ");
+			negative = tr("E ");
+		default:
+			break;
+		}
+
 		label->setText(QString::fromLatin1("%1%2° %3'' %4'").
-			arg(hour >= 0 ? "+" : "").
-			arg(hour).
+			arg(hour >= 0 ? positive : negative).
+			arg(abs(hour)).
 			arg(minute, 2, 10, QChar('0')).
 			arg(second, 2, 10, QChar('0')));
 	}
@@ -644,5 +676,18 @@ void ZeGotoControlCenter::SyncDateTimeWithSystem()
 		}
 
 		Synched = true;
+	}
+}
+
+void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
+{
+	if (ui.tabWidget->widget(index) == ui.tabLocation)
+	{
+		if (link != NULL)
+		{
+			link->Command(":Gg#");	// GetCurrentSiteLongitude
+			link->Command(":Gt#");	// GetCurrentSiteLatitude
+			link->Command(":Gu#");	// GetCurrentSiteAltitude
+		}
 	}
 }

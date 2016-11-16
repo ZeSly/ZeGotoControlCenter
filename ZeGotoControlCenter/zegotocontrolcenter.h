@@ -53,6 +53,7 @@ public:
 	void on_pushButton_TrackingSolar_clicked();
 	void on_pushButton_TrackingCustom_clicked();
 	void on_pushButton_PierFlipNow_clicked();
+	void on_tabWidget_currentChanged(int index);
 
 	// park_tab.cpp
 	void on_pushButton_Park_clicked();
@@ -84,7 +85,7 @@ private:
 	QTimer TelescopePositionTimer;
 	QTimer PierFlipAlertTimer;
 
-	void DisplayCoord(const char *s, QLabel *label, bool deg);
+	void DisplayCoord(const char *s, QLabel *label, bool deg, int geo = 0);
 
 	// TCP/IP server for ASCOM driver
 	QTcpServer *ASCOMServer;
