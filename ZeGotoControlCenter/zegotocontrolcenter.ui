@@ -2750,7 +2750,7 @@ to current Alt/Az</string>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QComboBox" name="comboBox"/>
+            <widget class="QComboBox" name="comboBox_TrackingRate"/>
            </item>
            <item row="2" column="2">
             <widget class="QSpinBox" name="spinBox_SlewRate">
@@ -2787,7 +2787,20 @@ to current Alt/Az</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
+           <item row="1" column="0">
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="4">
             <spacer name="horizontalSpacer_3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -2819,18 +2832,26 @@ to current Alt/Az</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="2" column="3">
+            <widget class="QPushButton" name="pushButton_SetSlewRate">
+             <property name="text">
+              <string>Set</string>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QPushButton" name="pushButton_SetCenteringRate">
+             <property name="text">
+              <string>Set</string>
              </property>
-            </spacer>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QPushButton" name="pushButton_SetGuideRate">
+             <property name="text">
+              <string>Set</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

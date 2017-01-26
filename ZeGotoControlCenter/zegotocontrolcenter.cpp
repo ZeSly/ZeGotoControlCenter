@@ -93,6 +93,11 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.comboBox_ConnectionType->setCurrentIndex(s);
 	ui.checkBox_SyncDateTime->setChecked(settings.value("SyncDateTimeWithSystem").toBool());
 
+	ui.comboBox_TrackingRate->addItem(tr("Sideral"));
+	ui.comboBox_TrackingRate->addItem(tr("Lunar"));
+	ui.comboBox_TrackingRate->addItem(tr("Solar"));
+	ui.comboBox_TrackingRate->addItem(tr("Custom"));
+
 	bool alert = settings.value("PierFlipAlert").toBool();
 	ui.checkBox_PierFlipAlert->setChecked(alert);
 	ui.timeEdit_PierFlipAlert->setEnabled(alert);
@@ -255,6 +260,7 @@ void ZeGotoControlCenter::linkConnected()
 	ui.pushButton_Connect->setDown(true);
 	setConnectedWidgetEnabled(true);
 	ui.groupBox_Tracking->setTitle(tr("Tracking: sideral"));
+	ui.tabWidget->setCurrentIndex(0);
 
 	if (ui.radioButton_PierFlipAutomatic->isChecked())
 	{

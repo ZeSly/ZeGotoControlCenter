@@ -69,6 +69,13 @@ public:
 	void on_lineEdit_PierFlipPictureFolder_editingFinished();
 	void on_comboBox_ManualSideOfPier_currentIndexChanged(int index);
 
+	void on_pushButton_SetSlewRate_clicked();
+	void on_spinBox_SlewRate_editingFinished();
+	void on_pushButton_SetCenteringRate_clicked();
+	void on_spinBox_CenteringRate_editingFinished();
+	void on_pushButton_SetGuideRate_clicked();
+	void on_doubleSpinBox_GuideRate_editingFinished();
+
 	void on_pushButton_GPS_OnOff_clicked();
 
 	void ASCOMConnect();

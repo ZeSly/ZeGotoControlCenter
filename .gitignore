@@ -218,3 +218,4 @@ ModelManifest.xml
 GeneratedFiles/
 Thumbs.db
 Output/
+*.autosave
