@@ -1,5 +1,39 @@
 #include "zegotocontrolcenter.h"
 
+
+void ZeGotoControlCenter::on_comboBox_TrackingRate_currentIndexChanged(int index)
+{
+	static int last_index = 0;
+
+	if (index != last_index)
+	{
+		last_index = index;
+
+		switch (index)
+		{
+		case 0:
+			on_pushButton_TrackingSideral_clicked();
+			break;
+
+		case 1:
+			on_pushButton_TrackingLunar_clicked();
+			break;
+
+		case 2:
+			on_pushButton_TrackingSolar_clicked();
+			break;
+
+		case 3:
+			on_pushButton_TrackingCustom_clicked();
+			ui.lineEdit_CustomTracking->setFocus();
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
 void ZeGotoControlCenter::on_pushButton_SetSlewRate_clicked()
 {
 	char cmd[64];
@@ -9,6 +43,7 @@ void ZeGotoControlCenter::on_pushButton_SetSlewRate_clicked()
 	if (link != NULL)
 	{
 		link->CommandBlind(cmd);
+		link->Command(":rS#");	// SetMaxRate
 	}
 }
 
@@ -26,6 +61,7 @@ void ZeGotoControlCenter::on_pushButton_SetCenteringRate_clicked()
 	if (link != NULL)
 	{
 		link->CommandBlind(cmd);
+		link->Command(":rC#");	// SetCenteringRate
 	}
 }
 
@@ -43,6 +79,7 @@ void ZeGotoControlCenter::on_pushButton_SetGuideRate_clicked()
 	if (link != NULL)
 	{
 		link->CommandBlind(cmd);
+		link->Command(":rG#");	// SetGuidingRate
 	}
 }
 

@@ -640,19 +640,28 @@ void ZeGotoControlCenter::on_pushButton_TrackingStop_clicked()
 
 void ZeGotoControlCenter::on_pushButton_TrackingSideral_clicked()
 {
-	link->CommandBlind(":TQ#");
+	if (link != NULL)
+	{
+		link->CommandBlind(":TQ#");
+	}
 	ui.groupBox_Tracking->setTitle(tr("Tracking: sideral"));
 }
 
 void ZeGotoControlCenter::on_pushButton_TrackingLunar_clicked()
 {
-	link->CommandBlind(":TL#");
+	if (link != NULL)
+	{
+		link->CommandBlind(":TL#");
+	}
 	ui.groupBox_Tracking->setTitle(tr("Tracking: lunar"));
 }
 
 void ZeGotoControlCenter::on_pushButton_TrackingSolar_clicked()
 {
-	link->CommandBlind(":TS#");
+	if (link != NULL)
+	{
+		link->CommandBlind(":TS#");
+	}
 	ui.groupBox_Tracking->setTitle(tr("Tracking: solar"));
 }
 
