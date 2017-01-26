@@ -367,12 +367,25 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		int max_speed = atoi(response);
 		ui.verticalSlider_Speed->setMaximum(max_speed);
 		ui.verticalSlider_Speed->setPageStep(max_speed / 10);
+		ui.spinBox_SlewRate->setMaximum(max_speed);
+		ui.spinBox_CenteringRate->setMaximum(max_speed);
 	}
 	else if (strcmp(":rS#", command) == 0)
 	{
 		int current_speed = atoi(response);
 		ui.verticalSlider_Speed->setValue(current_speed);
 		ui.lineEdit_Speed->setText(QString("%1").arg(current_speed));
+		ui.spinBox_SlewRate->setValue(current_speed);
+	}
+	else if (strcmp(":rC#", command) == 0)
+	{
+		int centering_speed = atoi(response);
+		ui.spinBox_CenteringRate->setValue(centering_speed);
+	}
+	else if (strcmp(":rG#", command) == 0)
+	{
+		double guide_speed = (double)atoi(response) / 10;
+		ui.doubleSpinBox_GuideRate->setValue(guide_speed);
 	}
 	else if (strcmp(":pS#", command) == 0)
 	{
@@ -405,6 +418,11 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		int elevation = atoi(response);
 		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(elevation));
+	}
+
+	else if (strcmp(":RS#", command) == 0)
+	{
+		int slew_rate = atoi(response);
 	}
 
 	int flip_in_secs;
@@ -688,6 +706,15 @@ void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
 			link->Command(":Gg#");	// GetCurrentSiteLongitude
 			link->Command(":Gt#");	// GetCurrentSiteLatitude
 			link->Command(":Gu#");	// GetCurrentSiteAltitude
+		}
+	}
+	else if (ui.tabWidget->widget(index) == ui.tabRates)
+	{
+		if (link != NULL)
+		{
+			link->Command(":rS#");	// SetMaxRate
+			link->Command(":rC#");	// SetCenteringRate
+			link->Command(":rG#");	// SetGuidingRate
 		}
 	}
 }
