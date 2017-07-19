@@ -424,6 +424,8 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		int elevation = atoi(response);
 		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(elevation));
+		TelescopePositionTimer.stop();
+		link->Command(":gps#");
 	}
 
 	else if (strcmp(":RS#", command) == 0)
@@ -714,6 +716,11 @@ void ZeGotoControlCenter::SyncDateTimeWithSystem()
 
 void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
 {
+	if (ui.tabWidget->widget(index) != ui.tabLocation)
+	{
+		if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
+	}
+
 	if (ui.tabWidget->widget(index) == ui.tabLocation)
 	{
 		if (link != NULL)

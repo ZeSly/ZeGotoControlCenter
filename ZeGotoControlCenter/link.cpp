@@ -59,6 +59,7 @@ Link::T_TypeCommand Link::TypesCommand[] =
     { ":rM", LINK_TYPE_STRING },
     { ":g+", LINK_TYPE_BLIND },
     { ":g-", LINK_TYPE_BLIND },
+	{ ":gps", LINK_TYPE_GPS },
     { ":B+", LINK_TYPE_BLIND },
     { ":B-", LINK_TYPE_BLIND },
     { ":ZGR", LINK_TYPE_STRING },
@@ -143,12 +144,23 @@ void Link::Command(const char *command)
             case LINK_TYPE_BLIND :  CommandBlind(command); break;
             case LINK_TYPE_BOOL :   CommandBool(command); break;
             case LINK_TYPE_STRING : CommandString(command); break;
+			case LINK_TYPE_GPS : CommandGPS(command); break;
             }
             break;
         }
     }
 }
     
+void Link::CommandGPS(const char *command)
+{
+	T_LastCommand Cmd;
+
+	Cmd.Command = QByteArray(command);
+	Cmd.Type = LINK_TYPE_GPS;
+
+	Send(&Cmd);
+}
+
 void Link::CommandString(const char *command)
 {
     T_LastCommand Cmd;
@@ -182,6 +194,11 @@ void Link::CommandBlind(const char *command)
 void Link::Send(T_LastCommand *cmd)
 {
     bool sent = false;
+
+	if (!commandStack.isEmpty() && commandStack.first().Type == LINK_TYPE_GPS)
+	{
+		commandStack.removeFirst();
+	}
 
     if (commandStack.isEmpty())
     {
@@ -221,6 +238,16 @@ void Link::Receive()
             rxComplete = true;
         }
     }
+	else if (last.Type == LINK_TYPE_GPS)
+	{
+		if (readData.at(readData.size() - 3) == '*')
+		{
+			int s = readData.size();
+			qDebug() << "len=" << s << "RX: " << readData.data();
+			readData.clear();
+			if (timer.isActive()) timer.stop();
+		}
+	}
 
 
     if (rxComplete)

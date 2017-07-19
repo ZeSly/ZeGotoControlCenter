@@ -8,9 +8,10 @@
 
 enum T_LinkTypeCommand
 {
-    LINK_TYPE_STRING,
-    LINK_TYPE_BOOL,
-    LINK_TYPE_BLIND
+	LINK_TYPE_STRING,
+	LINK_TYPE_BOOL,
+	LINK_TYPE_BLIND,
+	LINK_TYPE_GPS
 };
 
 class Link : public QObject
@@ -25,6 +26,7 @@ public:
     void Connect();
 
     void Command(const char *command);
+	void CommandGPS(const char *command);
     void CommandString(const char *command);
     void CommandBool(const char *command);
     void CommandBlind(const char *command);
@@ -59,7 +61,7 @@ private:
 
     QList<T_LastCommand> commandStack;
     QByteArray readData;
-    char resp[32];
+    char resp[128];
     QTimer timer;
 
     QIODevice *link;
