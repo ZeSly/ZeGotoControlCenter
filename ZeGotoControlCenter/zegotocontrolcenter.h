@@ -127,6 +127,9 @@ private:
 		WEST
 	};
 	T_PierSide PierSide;
+
+	void DecodeGPSFrame(const char *frame);
+	void SetPositionFixIndicator(int p);
 };
 
 #endif // ZEGOTOCONTROLCENTER_H

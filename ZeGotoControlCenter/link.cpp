@@ -240,19 +240,21 @@ void Link::Receive()
     }
 	else if (last.Type == LINK_TYPE_GPS)
 	{
-		if (readData.at(readData.size() - 3) == '*')
+		if (readData.size() > 2 && readData.at(readData.size() - 3) == '*')
 		{
 			int s = readData.size();
 			qDebug() << "len=" << s << "RX: " << readData.data();
+			strncpy(resp, readData.data(), sizeof resp);
 			readData.clear();
 			if (timer.isActive()) timer.stop();
+			emit response(last.Command.data(), resp);
 		}
 	}
 
 
     if (rxComplete)
     {
-        strcpy(resp, readData.data());
+        strncpy(resp, readData.data(), sizeof resp);
         qDebug() << "RX: " << resp;
         readData.clear();
         timer.stop();

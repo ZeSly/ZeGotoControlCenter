@@ -428,6 +428,11 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		link->Command(":gps#");
 	}
 
+	else if (strcmp(":gps#", command) == 0)
+	{
+		DecodeGPSFrame(response);
+	}
+
 	else if (strcmp(":RS#", command) == 0)
 	{
 		int slew_rate = atoi(response);
