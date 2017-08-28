@@ -74,7 +74,6 @@ void GPSStatusFrame::paintEvent(QPaintEvent * event)
 				painter.setPen(QPen(QColor("#f00"), 0));
 			}
 			QPoint sat_center(x, y);
-			//painter.drawEllipse(sat_center, 2, 2);
 			painter.drawPoint(sat_center);
 			painter.setFont(font);
 			painter.drawText(sat_center, sat.Id);
@@ -86,5 +85,7 @@ void GPSStatusFrame::paintEvent(QPaintEvent * event)
 			painter.setFont(QFont());
 			painter.drawText(rr, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextDontClip, sat.Id);
 			dd += bar_height;
-		}	}
+		}
+	}
+
 }

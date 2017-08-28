@@ -71,6 +71,8 @@ Link::T_TypeCommand Link::TypesCommand[] =
     { ":V", LINK_TYPE_STRING },
     { ":GIP", LINK_TYPE_STRING },
     { ":SIP", LINK_TYPE_STRING },
+
+	{ "END", LINK_TYPE_BLIND}
 };
 
 
@@ -135,7 +137,7 @@ void Link::Command(const char *command)
 {
     QString Cmd(command);
 
-    for (int i = 0 ; i < sizeof(TypesCommand) ; i++)
+    for (int i = 0 ; TypesCommand[i].Command.compare("END") != 0 ; i++)
     {
         if (Cmd.startsWith(TypesCommand[i].Command))
         {

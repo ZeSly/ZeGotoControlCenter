@@ -721,23 +721,20 @@ void ZeGotoControlCenter::SyncDateTimeWithSystem()
 
 void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
 {
-	if (ui.tabWidget->widget(index) != ui.tabLocation)
+	if (link != NULL)
 	{
-		if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
-	}
+		if (ui.tabWidget->widget(index) != ui.tabLocation)
+		{
+			if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
+		}
 
-	if (ui.tabWidget->widget(index) == ui.tabLocation)
-	{
-		if (link != NULL)
+		if (ui.tabWidget->widget(index) == ui.tabLocation)
 		{
 			link->Command(":Gg#");	// GetCurrentSiteLongitude
 			link->Command(":Gt#");	// GetCurrentSiteLatitude
 			link->Command(":Gu#");	// GetCurrentSiteAltitude
 		}
-	}
-	else if (ui.tabWidget->widget(index) == ui.tabRates)
-	{
-		if (link != NULL)
+		else if (ui.tabWidget->widget(index) == ui.tabRates)
 		{
 			link->Command(":rS#");	// SetMaxRate
 			link->Command(":rC#");	// SetCenteringRate

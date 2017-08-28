@@ -912,7 +912,7 @@ namespace ASCOM.ZeGoto
                 if (useGPS == true)
                 {
                     CheckConnected("The scope is not connected.");
-                    elevation = utilities.DMSToDegrees(CommandString("Ge", false));
+                    elevation = utilities.DMSToDegrees(CommandString("Gu", false));
                     using (Profile driverProfile = new Profile())
                     {
                         driverProfile.DeviceType = "Telescope";

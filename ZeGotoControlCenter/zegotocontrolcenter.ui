@@ -2295,7 +2295,7 @@ QSlider::handle:vertical:disabled
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabSetup">
        <attribute name="title">
@@ -3305,7 +3305,7 @@ with system time on connect</string>
            <item>
             <widget class="GPSStatusFrame" name="frame_GPSSatellites">
              <property name="autoFillBackground">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
