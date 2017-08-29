@@ -438,6 +438,12 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		int slew_rate = atoi(response);
 	}
 
+	else if (strcmp(":GPV#", command) == 0)
+	{
+		double voltage = strtod(response, NULL);
+		ui.label_MainVoltageValue->setText(QString("%1 V").arg(voltage, 0, 'f', 1));
+	}
+
 	int flip_in_secs;
 	if (PierSide == EAST)
 	{
@@ -542,7 +548,7 @@ void ZeGotoControlCenter::on_TelescopePositionTime()
 	link->CommandString(":GZ#"); // Get Azimuth
 	link->CommandString(":GL#"); // Get Local Time
 	link->CommandString(":pS#"); // Get Pier Side
-
+	link->CommandString(":GPV#");	// Get Power Voltage
 }
 
 void ZeGotoControlCenter::on_pushButton_Expand_clicked()
