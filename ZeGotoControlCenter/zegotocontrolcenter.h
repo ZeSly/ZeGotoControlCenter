@@ -60,6 +60,9 @@ public:
 	void on_pushButton_Unpark_clicked();
 	void on_comboBox_ParkPositions_currentIndexChanged();
 
+	void on_comboBox_Catalog_currentIndexChanged();
+	void on_comboBox_Object_currentIndexChanged();
+
 	void on_checkBox_PierFlipAlert_clicked();
 	void on_timeEdit_PierFlipAlert_timeChanged(const QTime &time);
 	void on_radioButton_PierFlipAutomatic_toggled(bool checked);
@@ -130,6 +133,8 @@ private:
 
 	void DecodeGPSFrame(const char *frame);
 	void SetPositionFixIndicator(int p);
+
+	QVector<QStringList> Stars;
 };
 
 #endif // ZEGOTOCONTROLCENTER_H

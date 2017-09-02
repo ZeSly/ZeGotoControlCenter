@@ -92,6 +92,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_GPSStatusFrame.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="goto_tab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="zegotocontrolcenter.h">
@@ -130,5 +133,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZeGotoControlCenter.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stars.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

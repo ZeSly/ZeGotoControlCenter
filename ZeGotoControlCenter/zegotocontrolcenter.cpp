@@ -125,6 +125,28 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 
 	ui.pushButton_GPS_OnOff->setDown(true);
 
+	QFile stars_file("stars.csv");
+	if (stars_file.open((QIODevice::ReadOnly | QIODevice::Text)))
+	{
+		bool first_line = true;
+		while (!stars_file.atEnd())
+		{
+			QString line = stars_file.readLine();
+			//if (!first_line)
+			{
+				QStringList fields = line.split('\t');
+				Stars << fields;
+			}
+			first_line = false;
+		}
+		stars_file.close();
+	}
+
+	ui.comboBox_Catalog->addItem(tr("Stars"));
+	ui.comboBox_Catalog->addItem(tr("Messier"));
+	ui.comboBox_Catalog->addItem(tr("NGC - New General Catalog"));
+	ui.comboBox_Catalog->addItem(tr("IC - Index Catalog"));
+
 	startASCOMServer();
 }
 
