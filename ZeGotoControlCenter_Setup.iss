@@ -23,6 +23,7 @@ DefaultDirName={pf}\ZeGotoControlCenter
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputBaseFilename=ZeGotoControlCenter_Setup
+ArchitecturesInstallIn64BitMode=x64
 Compression=lzma
 SolidCompression=yes
 UninstallFilesDir="{app}\Uninstall"
@@ -35,9 +36,14 @@ Name: "ascom"; Description: Install ASCOM driver
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "Win32\Release\ZeGotoControlCenter.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "Win32\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Flags: ignoreversion
+; 64 bits
+Source: "x64\Release\ZeGotoControlCenter.exe"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion
+Source: "x64\Release\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+; 32 bits
+Source: "Win32\Release\ZeGotoControlCenter.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion solidbreak
+Source: "Win32\Release\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+; ASCOM driver, 32 and 64 bits
+Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Flags: ignoreversion solidbreak
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Telescope.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
