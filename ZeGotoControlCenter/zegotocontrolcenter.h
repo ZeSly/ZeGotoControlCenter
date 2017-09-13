@@ -60,9 +60,13 @@ public:
 	void on_pushButton_Unpark_clicked();
 	void on_comboBox_ParkPositions_currentIndexChanged();
 
+	// goto_tab.cpp
 	void on_comboBox_Catalog_currentIndexChanged();
 	void on_comboBox_Object_currentIndexChanged();
+	void on_pushButton_Goto_clicked();
+	void on_pushButton_Sync_clicked();
 
+	// meridian_tab
 	void on_checkBox_PierFlipAlert_clicked();
 	void on_timeEdit_PierFlipAlert_timeChanged(const QTime &time);
 	void on_radioButton_PierFlipAutomatic_toggled(bool checked);
@@ -72,6 +76,7 @@ public:
 	void on_lineEdit_PierFlipPictureFolder_editingFinished();
 	void on_comboBox_ManualSideOfPier_currentIndexChanged(int index);
 
+	// rates_tap.cpp
 	void on_comboBox_TrackingRate_currentIndexChanged(int index);
 	void on_pushButton_SetSlewRate_clicked();
 	void on_spinBox_SlewRate_editingFinished();

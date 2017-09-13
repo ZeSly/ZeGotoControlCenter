@@ -132,11 +132,8 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		while (!stars_file.atEnd())
 		{
 			QString line = stars_file.readLine();
-			//if (!first_line)
-			{
-				QStringList fields = line.split('\t');
-				Stars << fields;
-			}
+			QStringList fields = line.trimmed().split('\t');
+			Stars << fields;
 			first_line = false;
 		}
 		stars_file.close();
@@ -189,6 +186,8 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.comboBox_ManualSideOfPier->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
 	ui.pushButton_GPS_OnOff->setEnabled(enable);
 	ui.pushButton_StopMonitor->setEnabled(enable);
+	ui.pushButton_Goto->setEnabled(enable);
+	ui.pushButton_Sync->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)

@@ -199,7 +199,7 @@ HD	RAJ2000	DEJ2000	Mag	Name	Constellation	Bayer
 148857	16 30 54.84	+01 59 02.8	 3.82	Marfic; Marfik; Marsic	Ophiucus	lambda
 218045	23 04 45.62	+15 12 19.3	 2.49	Markab	Pegasus	alpha
 61555	07 38 49.88	-26 48 14.0	 3.80	Markeb	Puppis	kappa
-79940	09 15 45.07	-37 24 47.3	 4.63	Markeb	Vela	
+79940	09 15 45.07	-37 24 47.3	 4.63	Markeb	Vela	kappa
 145001	16 08 04.55	+17 02 49.2	 5.00	Marsik	Hercules	kappa
 215182	22 43 00.13	+30 13 16.7	 2.93	Matar	Pegasus	eta
 48329	06 43 55.93	+25 07 52.2	 3.06	Mebsuta	Gemini	epsilon
@@ -246,7 +246,7 @@ HD	RAJ2000	DEJ2000	Mag	Name	Constellation	Bayer
 155763	17 08 47.23	+65 42 52.7	 3.17	Nod	Draco	dzeta
 175191	18 55 15.92	-26 17 47.7	 2.05	Nunki	Sagittarius	sigma
 137909	15 27 49.85	+29 06 19.8	 3.66	Nusakan	Corona Borealis	beta
-164975	18 05 01.22	-29 34 48.3	 4.66	Nushaba	Sagittarius	
+164975	18 05 01.22	-29 34 48.3	 4.66	Nushaba	Sagittarius	gamma
 194636	20 27 19.20	-18 12 42.1	 5.08	Okul	Capricornus	pi
 193924	20 25 38.85	-56 44 05.6	 1.94	Peacock	Pavo	alpha
 137422	15 20 43.75	+71 50 02.3	 3.00	Pherkad	Ursa Minor	gamma
@@ -318,7 +318,7 @@ HD	RAJ2000	DEJ2000	Mag	Name	Constellation	Bayer
 68257	08 12 12.70	+17 38 52.0	 6.02	Tegmen; Tegmine	Cancer	dzeta
 44478	06 22 57.59	+22 30 49.9	 2.87	Tejat Posterior	Gemini	mu
 188376	19 55 50.23	-26 17 58.9	 4.70	Terebell	Sagittarius	omega
-188603	19 56 56.82	-27 10 11.5	 4.54	Terebellum	Sagittarius	
+188603	19 56 56.82	-27 10 11.5	 4.54	Terebellum	Sagittarius	59
 189005	19 58 57.18	-26 11 45.0	 4.84	Terebellum	Sagittarius	60
 189763	20 02 39.46	-27 42 35.6	 4.43	Terebellum	Sagittarius	62
 36512	05 31 55.86	-07 18 05.5	 4.62	Thabit; Tabit	Orion	upsilon
