@@ -58,7 +58,10 @@ char *GetMyVersion()
 }
 
 ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
-	: QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint)
+	: QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+	Latitude(DBL_MAX),
+	Longitude(DBL_MAX),
+	Elevation(DBL_MAX)
 {
 	ui.setupUi(this);
 	this->setFixedSize(this->size());
@@ -141,6 +144,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		stars_file.close();
 	}
 
+	ui.comboBox_Catalog->addItem(tr(""));
 	ui.comboBox_Catalog->addItem(tr("Stars"));
 	ui.comboBox_Catalog->addItem(tr("Messier"));
 	ui.comboBox_Catalog->addItem(tr("NGC - New General Catalog"));
@@ -189,6 +193,8 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.pushButton_GPS_OnOff->setEnabled(enable);
 	ui.pushButton_RefreshSat->setEnabled(enable);
 	ui.pushButton_StopMonitor->setEnabled(enable);
+	ui.comboBox_Catalog->setEnabled(enable);
+	ui.comboBox_Object->setEnabled(enable);
 	ui.pushButton_Goto->setEnabled(enable);
 	ui.pushButton_Sync->setEnabled(enable);
 }
@@ -278,6 +284,9 @@ void ZeGotoControlCenter::linkConnected()
 	link->CommandString(":GpH#");    // Get Home Data
 	link->CommandString(":GC#");     // Get Current Date
 	link->CommandString(":GG#");     // Get UTC Offset Time
+	link->Command(":Gg#");	// GetCurrentSiteLongitude
+	link->Command(":Gt#");	// GetCurrentSiteLatitude
+	link->Command(":Gu#");	// GetCurrentSiteAltitude
 
 	ui.pushButton_Connect->setText(tr("Disconnect"));
 	ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-connect.png"));
@@ -438,16 +447,16 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 	else if (strcmp(":Gg#", command) == 0)
 	{
-		DisplayCoord(response, ui.label_GPS_Longitude_Value, true, 2);
+		DisplayCoord(response, ui.label_GPS_Longitude_Value, true, 2, &Longitude);
 	}
 	else if (strcmp(":Gt#", command) == 0)
 	{
-		DisplayCoord(response, ui.label_GPS_Latitude_Value, true, 1);
+		DisplayCoord(response, ui.label_GPS_Latitude_Value, true, 1, &Latitude);
 	}
 	else if (strcmp(":Gu#", command) == 0)
 	{
-		int elevation = atoi(response);
-		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(elevation));
+		Elevation = atof(response);
+		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(Elevation));
 	}
 
 	else if (strcmp(":gps#", command) == 0)
@@ -489,7 +498,7 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	}
 }
 
-void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg, int geo)
+void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg, int geo, double *value)
 {
 	QString r(s);
 
@@ -532,6 +541,11 @@ void ZeGotoControlCenter::DisplayCoord(const char *s, QLabel *label, bool deg, i
 			arg(hour).
 			arg(minute, 2, 10, QChar('0')).
 			arg(second, 2, 10, QChar('0')));
+	}
+
+	if (value != NULL)
+	{
+		*value = (double)hour + (double)minute / 60.0 + (double)second / 3600.0;
 	}
 }
 
@@ -761,13 +775,15 @@ void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
 		//	if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
 		//}
 
-		if (ui.tabWidget->widget(index) == ui.tabLocation)
-		{
-			link->Command(":Gg#");	// GetCurrentSiteLongitude
-			link->Command(":Gt#");	// GetCurrentSiteLatitude
-			link->Command(":Gu#");	// GetCurrentSiteAltitude
-		}
-		else if (ui.tabWidget->widget(index) == ui.tabRates)
+		//if (ui.tabWidget->widget(index) == ui.tabLocation ||
+		//	ui.tabWidget->widget(index) == ui.tabGoto)
+		//{
+		//	link->Command(":Gg#");	// GetCurrentSiteLongitude
+		//	link->Command(":Gt#");	// GetCurrentSiteLatitude
+		//	link->Command(":Gu#");	// GetCurrentSiteAltitude
+		//}
+		//else 
+		if (ui.tabWidget->widget(index) == ui.tabRates)
 		{
 			link->Command(":rS#");	// SetMaxRate
 			link->Command(":rC#");	// SetCenteringRate

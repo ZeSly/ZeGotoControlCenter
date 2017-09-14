@@ -1,24 +1,46 @@
 #include "zegotocontrolcenter.h"
 #include <QMessageBox>
+#include "SkyPosition.h"
 
 void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 {
-	if (ui.comboBox_Catalog->currentIndex() == 0)
+	SkyPosition sp;
+
+	if (ui.comboBox_Catalog->currentIndex() > 0)
+	{
+		sp.SetLocation(Longitude, Latitude, Elevation);
+	}
+
+	if (ui.comboBox_Catalog->currentIndex() == 1)
 	{
 		QStringList header = Stars.first();
+		int ira = header.indexOf("RAJ2000");
+		int idec = header.indexOf("DEJ2000");
 		int name = header.indexOf("Name");
 		int constellation = header.indexOf("Constellation");
 		int letter = header.indexOf("Bayer");
 
 		bool first = true;
+		int idx = 0;
 		for each (QStringList star in Stars)
 		{
 			if (!first)
 			{
-				QString label = QString("%1 - %2 %3").arg(star[name]).arg(star[letter]).arg(star[constellation]);
-				ui.comboBox_Object->addItem(label);
+				QStringList fields = star[ira].split(' ');
+				double ra = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+				fields = star[idec].split(' ');
+				double dec = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+
+				sp.SetEquatorialCoord(ra, dec);
+				double alt = sp.GetAltitude();
+				if (alt >= 0)
+				{
+					QString label = QString("%1 - %2 %3").arg(star[name]).arg(star[letter]).arg(star[constellation]);
+					ui.comboBox_Object->addItem(label, QVariant(idx));
+				}
 			}
 			first = false;
+			idx++;
 		}
 	}
 }
@@ -29,11 +51,25 @@ void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 	int ra_idx = header.indexOf("RAJ2000");
 	int dec_idx = header.indexOf("DEJ2000");
 
-	QStringList star = Stars[ui.comboBox_Object->currentIndex() + 1];
+	QStringList star = Stars[ui.comboBox_Object->currentData().toInt()];
+
+	QStringList fields = star[ra_idx].split(' ');
+	double _ra = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+	fields = star[dec_idx].split(' ');
+	double _d = fields[0].toDouble();
+	double _dec = fabs(_d) + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+	if (_d < 0) _dec = -_dec;
+
 	QString ra = star[ra_idx].remove(' ');
 	QString dec = star[dec_idx].remove(' ');
 	ui.lineEdit_GotoRA->setText(ra);
 	ui.lineEdit_GotoDec->setText(dec);
+
+	SkyPosition sp;
+	sp.SetLocation(Longitude, Latitude, Elevation);
+	sp.SetEquatorialCoord(_ra, _dec);
+	ui.lineEdit_GotoAltitude->setText(QString("%1").arg(sp.GetAltitude()));
+	ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(sp.GetAzimuth()));
 }
 
 void ZeGotoControlCenter::on_pushButton_Goto_clicked()

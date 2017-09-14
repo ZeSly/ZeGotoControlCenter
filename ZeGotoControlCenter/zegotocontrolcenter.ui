@@ -2777,19 +2777,6 @@ to current Alt/Az</string>
              <string>Target</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_Object">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="editable">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_Catalog">
                <property name="sizePolicy">
@@ -2836,6 +2823,19 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="comboBox_Object">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="1">
               <widget class="QLineEdit" name="lineEdit_GotoRA">
                <property name="sizePolicy">
@@ -2845,7 +2845,7 @@ to current Alt/Az</string>
                 </sizepolicy>
                </property>
                <property name="inputMask">
-                <string>00\h00\m00\s</string>
+                <string notr="true">00\h00\m00\s</string>
                </property>
               </widget>
              </item>
@@ -2868,10 +2868,68 @@ to current Alt/Az</string>
                 </sizepolicy>
                </property>
                <property name="inputMask">
-                <string>x00°00\m00\s</string>
+                <string notr="true">x00°00\m00\s</string>
                </property>
                <property name="text">
                 <string>°°ms</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_GotoAltitude">
+               <property name="text">
+                <string>Altitude</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLineEdit" name="lineEdit_GotoAltitude">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMask">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_GotoAzimuth">
+               <property name="text">
+                <string>Azimuth</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="lineEdit_GotoAzimuth">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMask">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -2909,6 +2967,19 @@ to current Alt/Az</string>
                 <string>Sync</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>

@@ -104,7 +104,7 @@ private:
 	QTimer TelescopePositionTimer;
 	QTimer PierFlipAlertTimer;
 
-	void DisplayCoord(const char *s, QLabel *label, bool deg, int geo = 0);
+	void DisplayCoord(const char *s, QLabel *label, bool deg, int geo = 0, double *value = NULL);
 
 	// TCP/IP server for ASCOM driver
 	QTcpServer *ASCOMServer;
@@ -143,6 +143,10 @@ private:
 	void SetPositionFixIndicator(int p);
 
 	QVector<QStringList> Stars;
+
+	double Latitude;
+	double Longitude;
+	double Elevation;
 };
 
 #endif // ZEGOTOCONTROLCENTER_H

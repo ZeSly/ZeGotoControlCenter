@@ -95,6 +95,9 @@
     <ClCompile Include="goto_tab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkyPosition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="zegotocontrolcenter.h">
@@ -115,6 +118,7 @@
     <CustomBuild Include="GPSStatusFrame.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="Resources\stars.csv" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_zegotocontrolcenter.h">
@@ -126,6 +130,9 @@
     <ClInclude Include="build_number.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SkyPosition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="ZeGotoControlCenter.ico" />
@@ -133,10 +140,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZeGotoControlCenter.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\stars.csv">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

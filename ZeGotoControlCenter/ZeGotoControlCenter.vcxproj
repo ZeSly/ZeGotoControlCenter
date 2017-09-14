@@ -199,6 +199,7 @@ copydll.cmd "$(OutDir)"
     <ClCompile Include="park_tab.cpp" />
     <ClCompile Include="rates_tab.cpp" />
     <ClCompile Include="singleapplication.cpp" />
+    <ClCompile Include="SkyPosition.cpp" />
     <ClCompile Include="zegotocontrolcenter.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +245,7 @@ copydll.cmd "$(OutDir)"
   <ItemGroup>
     <ClInclude Include="build_number.h" />
     <ClInclude Include="GeneratedFiles\ui_zegotocontrolcenter.h" />
+    <ClInclude Include="SkyPosition.h" />
     <CustomBuild Include="GPSStatusFrame.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing GPSStatusFrame.h...</Message>
