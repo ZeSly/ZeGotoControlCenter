@@ -2,6 +2,28 @@
 #include <QMessageBox>
 #include "SkyPosition.h"
 
+QString _Dec2DMS(double d, bool h)
+{
+	double fract;
+	double deg, min, sec;
+	QString ret;
+
+	fract = fabs(modf(d, &deg));
+	fract = modf(fract * 60.0, &min);
+	sec = fract * 60.0;
+	if (h)
+	{
+		ret = QString("%1:%2:%3").arg(deg, 2, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 0, '0');
+		//ret = sprintf(s, "%02.0f:%02.0f:%02.0f", deg, min, sec);
+	}
+	else
+	{
+		ret = QString::fromLatin1("%1° %2' %3''").arg(deg, 0, 'f', 0, '0').arg(min, 0, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
+		//ret = sprintf(s, "%.0f&deg;%.0f'%.2f''", deg, min, sec);
+	}
+	return ret;
+}
+
 void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 {
 	SkyPosition sp;
@@ -68,8 +90,8 @@ void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 	SkyPosition sp;
 	sp.SetLocation(Longitude, Latitude, Elevation);
 	sp.SetEquatorialCoord(_ra, _dec);
-	ui.lineEdit_GotoAltitude->setText(QString("%1").arg(sp.GetAltitude()));
-	ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(sp.GetAzimuth()));
+	ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+	ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
 }
 
 void ZeGotoControlCenter::on_pushButton_Goto_clicked()

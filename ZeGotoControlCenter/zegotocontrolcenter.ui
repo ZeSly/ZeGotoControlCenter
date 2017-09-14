@@ -2777,114 +2777,6 @@ to current Alt/Az</string>
              <string>Target</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_Catalog">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Catalog :</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox_Catalog">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_Object">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Object :</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_GotoRA">
-               <property name="text">
-                <string>RA</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QComboBox" name="comboBox_Object">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="editable">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="lineEdit_GotoRA">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="inputMask">
-                <string notr="true">00\h00\m00\s</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_GotoDec">
-               <property name="text">
-                <string>Dec</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLineEdit" name="lineEdit_GotoDec">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="inputMask">
-                <string notr="true">x00°00\m00\s</string>
-               </property>
-               <property name="text">
-                <string>°°ms</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_GotoAltitude">
-               <property name="text">
-                <string>Altitude</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
              <item row="4" column="1">
               <widget class="QLineEdit" name="lineEdit_GotoAltitude">
                <property name="sizePolicy">
@@ -2904,8 +2796,128 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_GotoAltitude">
+               <property name="text">
+                <string>Altitude</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_GotoDec">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Dec</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_Catalog">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Catalog :</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_GotoRA">
+               <property name="text">
+                <string>RA</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_Object">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Object :</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="lineEdit_GotoRA">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMask">
+                <string notr="true">00\h 00\m 00\s</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QLineEdit" name="lineEdit_GotoDec">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMask">
+                <string notr="true">x00° 00' 00''</string>
+               </property>
+               <property name="text">
+                <string>°° ' ''</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1" colspan="3">
+              <widget class="QComboBox" name="comboBox_Catalog">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" colspan="3">
+              <widget class="QComboBox" name="comboBox_Object">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
               <widget class="QLabel" name="label_GotoAzimuth">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string>Azimuth</string>
                </property>
@@ -2914,7 +2926,7 @@ to current Alt/Az</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="4" column="3">
               <widget class="QLineEdit" name="lineEdit_GotoAzimuth">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -2967,19 +2979,6 @@ to current Alt/Az</string>
                 <string>Sync</string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>
@@ -3639,6 +3638,62 @@ with system time on connect</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pushButton_Connect</tabstop>
+  <tabstop>pushButton_Expand</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboBox_ConnectionType</tabstop>
+  <tabstop>lineEdit_IPAddress</tabstop>
+  <tabstop>lineEdit_IPPort</tabstop>
+  <tabstop>pushButton_Park</tabstop>
+  <tabstop>pushButton_Unpark</tabstop>
+  <tabstop>comboBox_ParkPositions</tabstop>
+  <tabstop>lineEdit_ParkPositionAlt</tabstop>
+  <tabstop>lineEdit_ParkPositionAz</tabstop>
+  <tabstop>pushButton_SetParkPosition</tabstop>
+  <tabstop>comboBox_Catalog</tabstop>
+  <tabstop>comboBox_Object</tabstop>
+  <tabstop>lineEdit_GotoRA</tabstop>
+  <tabstop>lineEdit_GotoDec</tabstop>
+  <tabstop>lineEdit_GotoAltitude</tabstop>
+  <tabstop>lineEdit_GotoAzimuth</tabstop>
+  <tabstop>pushButton_Goto</tabstop>
+  <tabstop>pushButton_Sync</tabstop>
+  <tabstop>comboBox_TrackingRate</tabstop>
+  <tabstop>spinBox_SlewRate</tabstop>
+  <tabstop>pushButton_SetSlewRate</tabstop>
+  <tabstop>spinBox_CenteringRate</tabstop>
+  <tabstop>pushButton_SetCenteringRate</tabstop>
+  <tabstop>doubleSpinBox_GuideRate</tabstop>
+  <tabstop>pushButton_SetGuideRate</tabstop>
+  <tabstop>checkBox_PierFlipAlert</tabstop>
+  <tabstop>timeEdit_PierFlipAlert</tabstop>
+  <tabstop>radioButton_PierFlipAutomatic</tabstop>
+  <tabstop>radioButton_PierFlipManual</tabstop>
+  <tabstop>radioButton_PierFlipPictureFolder</tabstop>
+  <tabstop>lineEdit_PierFlipPictureFolder</tabstop>
+  <tabstop>pushButton_PierFlipPictureFolder</tabstop>
+  <tabstop>comboBox_ManualSideOfPier</tabstop>
+  <tabstop>pushButton_PierFlipNow</tabstop>
+  <tabstop>pushButton_GPS_OnOff</tabstop>
+  <tabstop>checkBox_SyncDateTime</tabstop>
+  <tabstop>pushButton_RefreshSat</tabstop>
+  <tabstop>pushButton_StopMonitor</tabstop>
+  <tabstop>pushButton_North</tabstop>
+  <tabstop>pushButton_West</tabstop>
+  <tabstop>pushButton_South</tabstop>
+  <tabstop>pushButton_East</tabstop>
+  <tabstop>pushButton_Stop</tabstop>
+  <tabstop>verticalSlider_Speed</tabstop>
+  <tabstop>lineEdit_Speed</tabstop>
+  <tabstop>pushButton_TrackingStop</tabstop>
+  <tabstop>pushButton_TrackingSideral</tabstop>
+  <tabstop>pushButton_TrackingLunar</tabstop>
+  <tabstop>pushButton_TrackingSolar</tabstop>
+  <tabstop>pushButton_TrackingCustom</tabstop>
+  <tabstop>lineEdit_CustomTracking</tabstop>
+  <tabstop>comboBox_CustomTrackingUnit</tabstop>
+ </tabstops>
  <resources>
   <include location="zegotocontrolcenter.qrc"/>
  </resources>
