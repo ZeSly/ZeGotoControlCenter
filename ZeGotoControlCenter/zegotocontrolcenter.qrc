@@ -1,13 +1,14 @@
 <RCC>
-  <qresource prefix="Images">
-    <file>Resources/em200_32.png</file>
-    <file>Resources/arrow-down.png</file>
-    <file>Resources/1413423723_Stop_32.png</file>
-    <file>Resources/rating.png</file>
-    <file>Resources/weather-clear.png</file>
-    <file>Resources/weather-clear-night.png</file>
-    <file>Resources/Comet_32.png</file>
-    <file>Resources/network-disconnect.png</file>
-    <file>Resources/network-connect.png</file>
-  </qresource>
+    <qresource prefix="/Images">
+        <file>Resources/em200_32.png</file>
+        <file>Resources/arrow-down.png</file>
+        <file>Resources/1413423723_Stop_32.png</file>
+        <file>Resources/rating.png</file>
+        <file>Resources/weather-clear.png</file>
+        <file>Resources/weather-clear-night.png</file>
+        <file>Resources/Comet_32.png</file>
+        <file>Resources/network-disconnect.png</file>
+        <file>Resources/network-connect.png</file>
+        <file>Resources/refresh-icon-53549-32.png</file>
+    </qresource>
 </RCC>

@@ -36,6 +36,7 @@ public:
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Expand_clicked();
 	void on_pushButton_StopMonitor_clicked();
+	void on_pushButton_StopMonitor_toggled();
 	void on_pushButton_Stop_clicked();
 	void on_pushButton_North_pressed();
 	void on_pushButton_North_released();
@@ -85,7 +86,9 @@ public:
 	void on_pushButton_SetGuideRate_clicked();
 	void on_doubleSpinBox_GuideRate_editingFinished();
 
+	// location_tab.cpp
 	void on_pushButton_GPS_OnOff_clicked();
+	void on_pushButton_RefreshSat_clicked();
 
 	void ASCOMConnect();
 	void ASCOMDisconnect();

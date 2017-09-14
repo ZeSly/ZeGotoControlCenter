@@ -18,6 +18,28 @@ void ZeGotoControlCenter::on_pushButton_GPS_OnOff_clicked()
 	}
 }
 
+void ZeGotoControlCenter::on_pushButton_RefreshSat_clicked()
+{
+	if (ui.pushButton_RefreshSat->isChecked())
+	{
+		TelescopePositionTimer.stop();
+		link->Command(":gps#");
+		ui.pushButton_RefreshSat->setDown(true);
+	}
+	else
+	{
+		ui.pushButton_RefreshSat->setDown(false);
+		if (!ui.pushButton_StopMonitor->isChecked())
+		{
+			TelescopePositionTimer.start();
+		}
+		else
+		{
+			on_TelescopePositionTime();
+		}
+	}
+}
+
 void ZeGotoControlCenter::SetPositionFixIndicator(int PositionFixIndicator)
 {
 	QString txt;

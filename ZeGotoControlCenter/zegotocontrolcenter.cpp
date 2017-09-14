@@ -75,6 +75,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		ui.comboBox_ConnectionType->addItem(portFullName, serialPortInfo.portName());
 	}
 
+	TelescopePositionTimer.setInterval(1000);
 	connect(&TelescopePositionTimer, SIGNAL(timeout()), SLOT(on_TelescopePositionTime()));
 	connect(&PierFlipAlertTimer, SIGNAL(timeout()), SLOT(on_PierFlipAlertTimer()));
 	connect(QApplication::instance(), SIGNAL(showUp()), SLOT(on_SingleInstance()));
@@ -124,6 +125,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.comboBox_ManualSideOfPier->addItem(tr("West"));
 
 	ui.pushButton_GPS_OnOff->setDown(true);
+	ui.pushButton_RefreshSat->setDown(false);
 
 	QFile stars_file("stars.csv");
 	if (stars_file.open((QIODevice::ReadOnly | QIODevice::Text)))
@@ -185,6 +187,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.pushButton_PierFlipNow->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
 	ui.comboBox_ManualSideOfPier->setEnabled(enable && ui.radioButton_PierFlipManual->isChecked());
 	ui.pushButton_GPS_OnOff->setEnabled(enable);
+	ui.pushButton_RefreshSat->setEnabled(enable);
 	ui.pushButton_StopMonitor->setEnabled(enable);
 	ui.pushButton_Goto->setEnabled(enable);
 	ui.pushButton_Sync->setEnabled(enable);
@@ -300,7 +303,7 @@ void ZeGotoControlCenter::linkConnected()
 	}
 
 	on_TelescopePositionTime();
-	TelescopePositionTimer.start(1000);
+	TelescopePositionTimer.start();
 }
 
 void ZeGotoControlCenter::showError(QString msg)
@@ -445,8 +448,6 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		int elevation = atoi(response);
 		ui.label_GPS_Elevation_Value->setText(QString("%1 m").arg(elevation));
-		TelescopePositionTimer.stop();
-		link->Command(":gps#");
 	}
 
 	else if (strcmp(":gps#", command) == 0)
@@ -601,9 +602,14 @@ void ZeGotoControlCenter::on_pushButton_StopMonitor_clicked()
 	}
 	else
 	{
-		TelescopePositionTimer.start(1000);
+		TelescopePositionTimer.start();
 		ui.pushButton_StopMonitor->setDown(false);
 	}
+}
+
+void ZeGotoControlCenter::on_pushButton_StopMonitor_toggled()
+{
+	qDebug("on_pushButton_StopMonitor_toggled  !!");
 }
 
 void ZeGotoControlCenter::on_pushButton_Stop_clicked()
@@ -750,10 +756,10 @@ void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
 {
 	if (link != NULL)
 	{
-		if (ui.tabWidget->widget(index) != ui.tabLocation)
-		{
-			if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
-		}
+		//if (ui.tabWidget->widget(index) != ui.tabLocation)
+		//{
+		//	if (!TelescopePositionTimer.isActive()) TelescopePositionTimer.start(1000);
+		//}
 
 		if (ui.tabWidget->widget(index) == ui.tabLocation)
 		{

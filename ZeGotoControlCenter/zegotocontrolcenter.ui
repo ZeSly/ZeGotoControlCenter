@@ -55,7 +55,7 @@ QPushButton:hover
                                     stop: 0.51 #666, stop: 1 #666);
 }
  
-QPushButton:pressed
+QPushButton:checked
 {
     border-style: inset;
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -302,6 +302,9 @@ QSlider::handle:vertical:disabled
           <property name="icon">
            <iconset resource="zegotocontrolcenter.qrc">
             <normaloff>:/Images/Resources/network-disconnect.png</normaloff>:/Images/Resources/network-disconnect.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -2868,7 +2871,7 @@ to current Alt/Az</string>
                 <string>x00°00\m00\s</string>
                </property>
                <property name="text">
-                <string>°ms</string>
+                <string>°°ms</string>
                </property>
               </widget>
              </item>
@@ -3509,6 +3512,26 @@ with system time on connect</string>
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
+             <widget class="QPushButton" name="pushButton_RefreshSat">
+              <property name="geometry">
+               <rect>
+                <x>510</x>
+                <y>0</y>
+                <width>23</width>
+                <height>23</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="zegotocontrolcenter.qrc">
+                <normaloff>:/Images/Resources/refresh-icon-53549-32.png</normaloff>:/Images/Resources/refresh-icon-53549-32.png</iconset>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
             </widget>
            </item>
           </layout>
