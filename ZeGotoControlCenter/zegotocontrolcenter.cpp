@@ -61,7 +61,11 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	: QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
 	Latitude(DBL_MAX),
 	Longitude(DBL_MAX),
-	Elevation(DBL_MAX)
+	Elevation(DBL_MAX),
+	lineEdit_GotoAltitude_textHasChanged(false),
+	lineEdit_GotoAzimuth_textHasChanged(false),
+	lineEdit_GotoDec_textHasChanged(false),
+	lineEdit_GotoRA_textHasChanged(false)
 {
 	ui.setupUi(this);
 	this->setFixedSize(this->size());

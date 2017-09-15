@@ -27,6 +27,7 @@ ArchitecturesInstallIn64BitMode=x64
 Compression=lzma
 SolidCompression=yes
 UninstallFilesDir="{app}\Uninstall"
+OutputDir=.
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

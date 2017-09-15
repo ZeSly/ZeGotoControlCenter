@@ -66,6 +66,14 @@ public:
 	void on_comboBox_Object_currentIndexChanged();
 	void on_pushButton_Goto_clicked();
 	void on_pushButton_Sync_clicked();
+	void on_lineEdit_GotoRA_editingFinished();
+	void on_lineEdit_GotoRA_textChanged(const QString & text);
+	void on_lineEdit_GotoDec_editingFinished();
+	void on_lineEdit_GotoDec_textChanged(const QString & text);
+	void on_lineEdit_GotoAltitude_editingFinished();
+	void on_lineEdit_GotoAltitude_textChanged(const QString & text);
+	void on_lineEdit_GotoAzimuth_editingFinished();
+	void on_lineEdit_GotoAzimuth_textChanged(const QString & text);
 
 	// meridian_tab
 	void on_checkBox_PierFlipAlert_clicked();
@@ -147,6 +155,14 @@ private:
 	double Latitude;
 	double Longitude;
 	double Elevation;
+
+	bool lineEdit_GotoRA_textHasChanged;
+	bool lineEdit_GotoDec_textHasChanged;
+	bool lineEdit_GotoAltitude_textHasChanged;
+	bool lineEdit_GotoAzimuth_textHasChanged;
+
+	void GotoEd2AltAz();
+	void GotoAltAz2Ed();
 };
 
 #endif // ZEGOTOCONTROLCENTER_H

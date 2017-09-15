@@ -33,7 +33,14 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 		sp.SetLocation(Longitude, Latitude, Elevation);
 	}
 
-	if (ui.comboBox_Catalog->currentIndex() == 1)
+	ui.comboBox_Object->clear();
+
+	switch (ui.comboBox_Catalog->currentIndex())
+	{
+	default:
+		break;
+
+	case 1:
 	{
 		QStringList header = Stars.first();
 		int ira = header.indexOf("RAJ2000");
@@ -65,33 +72,60 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 			idx++;
 		}
 	}
+	break;
+
+	case 2:
+		for (unsigned int i = 1; i <= 110; i++)
+		{
+			ui.comboBox_Object->addItem(QString("M %1").arg(i));
+		}
+		break;
+	}
 }
 
 void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 {
-	QStringList header = Stars.first();
-	int ra_idx = header.indexOf("RAJ2000");
-	int dec_idx = header.indexOf("DEJ2000");
+	switch (ui.comboBox_Catalog->currentIndex())
+	{
+	default:
+		break;
 
-	QStringList star = Stars[ui.comboBox_Object->currentData().toInt()];
+	case 1:
+	{
+		unsigned int idx_star = ui.comboBox_Object->currentData().toInt();
+		if (idx_star > 0)
+		{
+			QStringList header = Stars.first();
+			int ra_idx = header.indexOf("RAJ2000");
+			int dec_idx = header.indexOf("DEJ2000");
+			QStringList star = Stars[idx_star];
 
-	QStringList fields = star[ra_idx].split(' ');
-	double _ra = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
-	fields = star[dec_idx].split(' ');
-	double _d = fields[0].toDouble();
-	double _dec = fabs(_d) + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
-	if (_d < 0) _dec = -_dec;
+			QStringList fields = star[ra_idx].split(' ');
+			double _ra = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+			fields = star[dec_idx].split(' ');
+			double _d = fields[0].toDouble();
+			double _dec = fabs(_d) + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
+			if (_d < 0) _dec = -_dec;
 
-	QString ra = star[ra_idx].remove(' ');
-	QString dec = star[dec_idx].remove(' ');
-	ui.lineEdit_GotoRA->setText(ra);
-	ui.lineEdit_GotoDec->setText(dec);
+			QString ra = star[ra_idx].remove(' ');
+			QString dec = star[dec_idx].remove(' ');
+			ui.lineEdit_GotoRA->setText(ra);
+			ui.lineEdit_GotoDec->setText(dec);
 
-	SkyPosition sp;
-	sp.SetLocation(Longitude, Latitude, Elevation);
-	sp.SetEquatorialCoord(_ra, _dec);
-	ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
-	ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+			SkyPosition sp;
+			sp.SetLocation(Longitude, Latitude, Elevation);
+			sp.SetEquatorialCoord(_ra, _dec);
+			ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+			ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+		}
+	}
+	break;
+	}
+
+	lineEdit_GotoRA_textHasChanged = false;
+	lineEdit_GotoDec_textHasChanged = false;
+	lineEdit_GotoAltitude_textHasChanged = false;
+	lineEdit_GotoAzimuth_textHasChanged = false;
 }
 
 void ZeGotoControlCenter::on_pushButton_Goto_clicked()
@@ -126,4 +160,118 @@ void ZeGotoControlCenter::on_pushButton_Sync_clicked()
 		link->Command(cmd);
 		link->Command(":CM#");
 	}
+}
+
+void ZeGotoControlCenter::GotoEd2AltAz()
+{
+	double h = 0;
+	double m = 0;
+	double s = 0;
+
+	QStringList fields = ui.lineEdit_GotoRA->text().split(QRegExp("[^0-9]+"));
+	h = fields[0].toDouble();
+	if (fields.size() > 1) m = fields[1].toDouble();
+	if (fields.size() > 2) s = fields[2].toDouble();
+	double ra = h + m / 60.0 + s / 3600.0;
+
+	h = 0;
+	m = 0;
+	s = 0;
+	fields = ui.lineEdit_GotoDec->text().split(QRegExp("[^0-9]+"));
+	h = fields[0].toDouble();
+	if (fields.size() > 1) m = fields[1].toDouble();
+	if (fields.size() > 2) s = fields[2].toDouble();
+	double dec = fabs(h) + m / 60.0 + s / 3600.0;
+	if (h < 0) dec = -dec;
+
+	SkyPosition sp;
+	sp.SetLocation(Longitude, Latitude, Elevation);
+	sp.SetEquatorialCoord(ra, dec);
+	ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+	ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+}
+
+void ZeGotoControlCenter::GotoAltAz2Ed()
+{
+	double d = 0;
+	double m = 0;
+	double s = 0;
+
+	QStringList fields = ui.lineEdit_GotoAzimuth->text().split(QRegExp("[^0-9]+"));
+	d = fields[0].toDouble();
+	if (fields.size() > 1) m = fields[1].toDouble();
+	if (fields.size() > 2) s = fields[2].toDouble();
+	double az = d + m / 60.0 + s / 3600.0;
+
+	d = 0;
+	m = 0;
+	s = 0;
+	fields = ui.lineEdit_GotoAltitude->text().split(QRegExp("[^0-9]+"));
+	d = fields[0].toDouble();
+	if (fields.size() > 1) m = fields[1].toDouble();
+	if (fields.size() > 2) s = fields[2].toDouble();
+	double alt = fabs(d) + m / 60.0 + s / 3600.0;
+	if (d < 0) alt = -alt;
+
+	SkyPosition sp;
+	sp.SetLocation(Longitude, Latitude, Elevation);
+	sp.SetAzimuthalCoord(alt, az);
+	ui.lineEdit_GotoRA->setText(QString("%1").arg(_Dec2DMS(sp.GetRightAscension(), false)));
+	ui.lineEdit_GotoDec->setText(QString("%1").arg(_Dec2DMS(sp.GetDeclination(), false)));
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoRA_editingFinished()
+{
+	if (lineEdit_GotoRA_textHasChanged)
+		ui.comboBox_Catalog->setCurrentIndex(0);
+	lineEdit_GotoRA_textHasChanged = false;
+
+	GotoEd2AltAz();
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoRA_textChanged(const QString & text)
+{
+	lineEdit_GotoRA_textHasChanged = true;
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoDec_editingFinished()
+{
+	if (lineEdit_GotoDec_textHasChanged)
+		ui.comboBox_Catalog->setCurrentIndex(0);
+	lineEdit_GotoDec_textHasChanged = false;
+
+	GotoEd2AltAz();
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoDec_textChanged(const QString & text)
+{
+	lineEdit_GotoDec_textHasChanged = true;
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoAltitude_editingFinished()
+{
+	if (lineEdit_GotoAltitude_textHasChanged)
+		ui.comboBox_Catalog->setCurrentIndex(0);
+	lineEdit_GotoAltitude_textHasChanged = false;
+
+	GotoAltAz2Ed();
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoAltitude_textChanged(const QString & text)
+{
+	lineEdit_GotoAltitude_textHasChanged = true;
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoAzimuth_editingFinished()
+{
+	if (lineEdit_GotoAzimuth_textHasChanged)
+		ui.comboBox_Catalog->setCurrentIndex(0);
+	lineEdit_GotoAzimuth_textHasChanged = false;
+
+	GotoAltAz2Ed();
+}
+
+void ZeGotoControlCenter::on_lineEdit_GotoAzimuth_textChanged(const QString & text)
+{
+	lineEdit_GotoAzimuth_textHasChanged = true;
 }
