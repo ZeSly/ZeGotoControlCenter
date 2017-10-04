@@ -151,6 +151,7 @@ private:
 	void SetPositionFixIndicator(int p);
 
 	QVector<QStringList> Stars;
+	QVector<QStringList> Messier;
 
 	double Latitude;
 	double Longitude;

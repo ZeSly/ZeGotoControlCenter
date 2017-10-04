@@ -118,7 +118,9 @@
     <CustomBuild Include="GPSStatusFrame.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Resources\stars.csv" />
+    <CustomBuild Include="Resources\stars.csv">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_zegotocontrolcenter.h">
@@ -136,9 +138,16 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="ZeGotoControlCenter.ico" />
-    <Image Include="icon1.ico" />
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZeGotoControlCenter.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\messier.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

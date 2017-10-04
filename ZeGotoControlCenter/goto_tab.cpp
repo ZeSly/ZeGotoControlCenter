@@ -11,6 +11,11 @@ QString _Dec2DMS(double d, bool h)
 	fract = fabs(modf(d, &deg));
 	fract = modf(fract * 60.0, &min);
 	sec = fract * 60.0;
+	if (round(sec * 100.0) == 6000.0)
+	{
+		sec = 0.0;
+		min += 1;
+	}
 	if (h)
 	{
 		ret = QString("%1:%2:%3").arg(deg, 2, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 0, '0');
@@ -18,7 +23,7 @@ QString _Dec2DMS(double d, bool h)
 	}
 	else
 	{
-		ret = QString::fromLatin1("%1° %2' %3''").arg(deg, 0, 'f', 0, '0').arg(min, 0, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
+		ret = QString::fromLatin1("%1° %2' %3''").arg(deg, 0, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
 		//ret = sprintf(s, "%.0f&deg;%.0f'%.2f''", deg, min, sec);
 	}
 	return ret;
@@ -75,30 +80,67 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 	break;
 
 	case 2:
-		for (unsigned int i = 1; i <= 110; i++)
+	{
+		QStringList header = Messier.first();
+		int ira = header.indexOf("RAB2000");
+		int idec = header.indexOf("DEB2000");
+		int m = header.indexOf("Messier");
+		int ngc = header.indexOf("Name");
+		int constellation = header.indexOf("Const");
+		int name = header.indexOf("Object");
+
+		bool first = true;
+		int idx = 0;
+		for each (QStringList messier in Messier)
 		{
-			ui.comboBox_Object->addItem(QString("M %1").arg(i));
+			if (!first)
+			{
+				double ra = messier[ira].toDouble() * 24.0 / 360.0;
+				double dec = messier[idec].toDouble();
+				sp.SetEquatorialCoord(ra, dec);
+				double alt = sp.GetAltitude();
+				//if (alt >= 0)
+				{
+					QString label;
+					if (messier[name].isEmpty())
+					{
+						label = QString("%1 (%2)").arg(messier[m]).arg(messier[ngc]);
+					}
+					else
+					{
+						label = QString("%1 (%2) - %3").arg(messier[m]).arg(messier[ngc]).arg(messier[name]);
+					}
+					ui.comboBox_Object->addItem(label, QVariant(idx));
+				}
+			}
+			first = false;
+			idx++;
 		}
-		break;
+	}
+	break;
 	}
 }
 
 void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 {
-	switch (ui.comboBox_Catalog->currentIndex())
-	{
-	default:
-		break;
+	SkyPosition sp;
+	sp.SetLocation(Longitude, Latitude, Elevation);
 
-	case 1:
+	unsigned int idx = ui.comboBox_Object->currentData().toInt();
+
+	if (idx > 0)
 	{
-		unsigned int idx_star = ui.comboBox_Object->currentData().toInt();
-		if (idx_star > 0)
+		switch (ui.comboBox_Catalog->currentIndex())
+		{
+		default:
+			break;
+
+		case 1:
 		{
 			QStringList header = Stars.first();
 			int ra_idx = header.indexOf("RAJ2000");
 			int dec_idx = header.indexOf("DEJ2000");
-			QStringList star = Stars[idx_star];
+			QStringList star = Stars[idx];
 
 			QStringList fields = star[ra_idx].split(' ');
 			double _ra = fields[0].toDouble() + fields[1].toDouble() / 60.0 + fields[2].toDouble() / 3600.0;
@@ -112,14 +154,31 @@ void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 			ui.lineEdit_GotoRA->setText(ra);
 			ui.lineEdit_GotoDec->setText(dec);
 
-			SkyPosition sp;
-			sp.SetLocation(Longitude, Latitude, Elevation);
 			sp.SetEquatorialCoord(_ra, _dec);
 			ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
 			ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
 		}
-	}
-	break;
+		break;
+
+		case 2:
+		{
+			QStringList header = Messier.first();
+			int ra_idx = header.indexOf("RAB2000");
+			int dec_idx = header.indexOf("DEB2000");
+			QStringList messier = Messier[idx];
+
+			double ra = messier[ra_idx].toDouble() * 24.0 / 360.0;
+			double dec = messier[dec_idx].toDouble();
+			ui.lineEdit_GotoRA->setText(_Dec2DMS(ra, true));
+			ui.lineEdit_GotoDec->setText(_Dec2DMS(dec, false));
+
+			sp.SetEquatorialCoord(ra, dec);
+			ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+			ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+		}
+		break;
+
+		}
 	}
 
 	lineEdit_GotoRA_textHasChanged = false;
@@ -133,7 +192,7 @@ void ZeGotoControlCenter::on_pushButton_Goto_clicked()
 	QString sRA = ui.lineEdit_GotoRA->text();
 	QString sDec = ui.lineEdit_GotoDec->text();
 
-	if(QMessageBox::question(this, tr("Goto to equatoriale coordinates"), QString("The telescope will got to\n%1 %2\nAre you sure ?").arg(sRA).arg(sDec)) == QMessageBox::Yes)
+	if (QMessageBox::question(this, tr("Goto to equatoriale coordinates"), QString("The telescope will got to\n%1 %2\nAre you sure ?").arg(sRA).arg(sDec)) == QMessageBox::Yes)
 	{
 		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#')).toLocal8Bit();
 		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace('s', '#')).toLocal8Bit();
@@ -152,7 +211,7 @@ void ZeGotoControlCenter::on_pushButton_Sync_clicked()
 
 	if (QMessageBox::question(this, tr("Sync to equatoriale coordinates"), QString("Confirm the telescope is pointing to\n%1 %2\n").arg(sRA).arg(sDec)) == QMessageBox::Yes)
 	{
-		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s','#')).toLocal8Bit();
+		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#')).toLocal8Bit();
 		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace('s', '#')).toLocal8Bit();
 		char *cmd = cmd_RA.data();
 		link->Command(cmd);

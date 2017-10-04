@@ -137,15 +137,62 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	QFile stars_file("stars.csv");
 	if (stars_file.open((QIODevice::ReadOnly | QIODevice::Text)))
 	{
-		bool first_line = true;
 		while (!stars_file.atEnd())
 		{
 			QString line = stars_file.readLine();
 			QStringList fields = line.trimmed().split('\t');
 			Stars << fields;
-			first_line = false;
 		}
 		stars_file.close();
+	}
+
+	QFile messier_file("messier.csv");
+	if (messier_file.open((QIODevice::ReadOnly | QIODevice::Text)))
+	{
+		int idx_Object = 0, idx_Name = 0;
+		bool first_line = true;
+		QStringList prec;
+		while (!messier_file.atEnd())
+		{
+			QString line = messier_file.readLine();
+			QStringList fields = line.trimmed().split(',');
+			if (first_line)
+			{
+				first_line = false;
+				idx_Object = fields.indexOf("Object");
+				idx_Name = fields.indexOf("Name");
+			}
+			else
+			{
+				if (fields[idx_Name].at(0) == 'I')
+					fields[idx_Name] = fields[idx_Name].replace("I", "IC ");
+				else
+					fields[idx_Name] = "NGC " + fields[idx_Name];
+				if (fields[idx_Object] == fields[0]) fields[idx_Object] = "";
+
+				if (!prec.isEmpty())
+				{
+					if (prec[0] == fields[0])
+					{
+						if (prec[idx_Object] != fields[idx_Object])
+						{
+							if (!prec[idx_Object].isEmpty()) 
+								Messier << prec;
+							else
+								Messier << fields;
+							fields.clear();
+						}
+					}
+					else
+					{
+						Messier << prec;
+					}
+				}
+			}
+			prec = fields;
+		}
+		Messier << prec;
+		messier_file.close();
 	}
 
 	ui.comboBox_Catalog->addItem(tr(""));
