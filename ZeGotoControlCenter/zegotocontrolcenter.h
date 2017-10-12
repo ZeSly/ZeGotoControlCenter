@@ -7,6 +7,7 @@
 #include <QTcpServer>
 #include <QTime>
 #include <QSystemTrayIcon>
+#include <QSemaphore>
 
 #include "ui_zegotocontrolcenter.h"
 #include "link.h"
@@ -64,6 +65,7 @@ public:
 	// goto_tab.cpp
 	void on_comboBox_Catalog_currentIndexChanged();
 	void on_comboBox_Object_currentIndexChanged();
+	void on_comboBox_Object_editTextChanged(const QString & text);
 	void on_pushButton_Goto_clicked();
 	void on_pushButton_Sync_clicked();
 	void on_lineEdit_GotoRA_editingFinished();
@@ -111,6 +113,7 @@ private:
 	Link *link;
 	QTimer TelescopePositionTimer;
 	QTimer PierFlipAlertTimer;
+	QSemaphore unique;
 
 	void DisplayCoord(const char *s, QLabel *label, bool deg, int geo = 0, double *value = NULL);
 
@@ -152,6 +155,11 @@ private:
 
 	QVector<QStringList> Stars;
 	QVector<QStringList> Messier;
+	QMap<uint, QStringList> NewGeneralCatalog;
+	QMap<uint, QStringList> IndexCatalog;
+	QStringList ngc_ic_header;
+
+	void LoadCat(QString filename, QVector<QStringList> &cat);
 
 	double Latitude;
 	double Longitude;

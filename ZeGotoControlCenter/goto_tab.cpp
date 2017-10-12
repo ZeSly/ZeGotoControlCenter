@@ -1,5 +1,6 @@
 #include "zegotocontrolcenter.h"
 #include <QMessageBox>
+#include <QFile>
 #include "SkyPosition.h"
 
 QString _Dec2DMS(double d, bool h)
@@ -19,14 +20,27 @@ QString _Dec2DMS(double d, bool h)
 	if (h)
 	{
 		ret = QString("%1:%2:%3").arg(deg, 2, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 0, '0');
-		//ret = sprintf(s, "%02.0f:%02.0f:%02.0f", deg, min, sec);
 	}
 	else
 	{
 		ret = QString::fromLatin1("%1° %2' %3''").arg(deg, 0, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
-		//ret = sprintf(s, "%.0f&deg;%.0f'%.2f''", deg, min, sec);
 	}
 	return ret;
+}
+
+void ZeGotoControlCenter::LoadCat(QString filename, QVector<QStringList> &cat)
+{
+	QFile file(filename);
+	if (file.open((QIODevice::ReadOnly | QIODevice::Text)))
+	{
+		while (!file.atEnd())
+		{
+			QString line = file.readLine();
+			QStringList fields = line.trimmed().split('\t');
+			cat << fields;
+		}
+		file.close();
+	}
 }
 
 void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
@@ -43,6 +57,7 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 	switch (ui.comboBox_Catalog->currentIndex())
 	{
 	default:
+		ui.comboBox_Object->setEditable(false);
 		break;
 
 	case 1:
@@ -76,6 +91,7 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 			first = false;
 			idx++;
 		}
+		ui.comboBox_Object->setEditable(false);
 	}
 	break;
 
@@ -99,10 +115,10 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 				double dec = messier[idec].toDouble();
 				sp.SetEquatorialCoord(ra, dec);
 				double alt = sp.GetAltitude();
-				//if (alt >= 0)
+				if (alt >= 0)
 				{
 					QString label;
-					if (messier[name].isEmpty())
+					if (messier.size() <= name)
 					{
 						label = QString("%1 (%2)").arg(messier[m]).arg(messier[ngc]);
 					}
@@ -115,6 +131,55 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 			}
 			first = false;
 			idx++;
+		}
+		ui.comboBox_Object->setEditable(false);
+	}
+	break;
+	case 3:
+	{
+		ui.comboBox_Object->setEditable(true);
+		ui.comboBox_Object->setStyleSheet("QComboBox:editable { background: #500; }");
+
+		int ira = ngc_ic_header.indexOf("RAJ2000");
+		int idec = ngc_ic_header.indexOf("DEJ2000");
+
+		QMapIterator<uint, QStringList> ngc(NewGeneralCatalog);
+		while (ngc.hasNext() && ui.comboBox_Object->count() < 20)
+		{
+			ngc.next();
+			QStringList o = ngc.value();
+			double ra = o[ira].toDouble() * 24.0 / 360.0;
+			double dec = o[idec].toDouble();
+			sp.SetEquatorialCoord(ra, dec);
+			double alt = sp.GetAltitude();
+			if (alt >= 0)
+			{
+				ui.comboBox_Object->addItem(QString("NGC %1").arg(ngc.key()), QVariant(ngc.key()));
+			}
+		}
+	}
+	break;
+	case 4:
+	{
+		ui.comboBox_Object->setEditable(true);
+		ui.comboBox_Object->setStyleSheet("QComboBox:editable { background: #500; }");
+
+		int ira = ngc_ic_header.indexOf("RAJ2000");
+		int idec = ngc_ic_header.indexOf("DEJ2000");
+
+		QMapIterator<uint, QStringList> ngc(IndexCatalog);
+		while (ngc.hasNext() && ui.comboBox_Object->count() < 20)
+		{
+			ngc.next();
+			QStringList o = ngc.value();
+			double ra = o[ira].toDouble() * 24.0 / 360.0;
+			double dec = o[idec].toDouble();
+			sp.SetEquatorialCoord(ra, dec);
+			double alt = sp.GetAltitude();
+			if (alt >= 0)
+			{
+				ui.comboBox_Object->addItem(QString("IC %1").arg(ngc.key()), QVariant(ngc.key()));
+			}
 		}
 	}
 	break;
@@ -178,6 +243,38 @@ void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 		}
 		break;
 
+		case 3:
+		{
+			int ra_idx = ngc_ic_header.indexOf("RAJ2000");
+			int dec_idx = ngc_ic_header.indexOf("DEJ2000");
+			QStringList ngc = NewGeneralCatalog[(uint)idx];
+
+			double ra = ngc[ra_idx].toDouble() * 24.0 / 360.0;
+			double dec = ngc[dec_idx].toDouble();
+			ui.lineEdit_GotoRA->setText(_Dec2DMS(ra, true));
+			ui.lineEdit_GotoDec->setText(_Dec2DMS(dec, false));
+
+			sp.SetEquatorialCoord(ra, dec);
+			ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+			ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+		}
+		break;
+		case 4:
+		{
+			int ra_idx = ngc_ic_header.indexOf("RAJ2000");
+			int dec_idx = ngc_ic_header.indexOf("DEJ2000");
+			QStringList ic = IndexCatalog[(uint)idx];
+
+			double ra = ic[ra_idx].toDouble() * 24.0 / 360.0;
+			double dec = ic[dec_idx].toDouble();
+			ui.lineEdit_GotoRA->setText(_Dec2DMS(ra, true));
+			ui.lineEdit_GotoDec->setText(_Dec2DMS(dec, false));
+
+			sp.SetEquatorialCoord(ra, dec);
+			ui.lineEdit_GotoAltitude->setText(QString("%1").arg(_Dec2DMS(sp.GetAltitude(), false)));
+			ui.lineEdit_GotoAzimuth->setText(QString("%1").arg(_Dec2DMS(sp.GetAzimuth(), false)));
+		}
+		break;
 		}
 	}
 
@@ -185,6 +282,72 @@ void ZeGotoControlCenter::on_comboBox_Object_currentIndexChanged()
 	lineEdit_GotoDec_textHasChanged = false;
 	lineEdit_GotoAltitude_textHasChanged = false;
 	lineEdit_GotoAzimuth_textHasChanged = false;
+}
+
+void ZeGotoControlCenter::on_comboBox_Object_editTextChanged(const QString & text)
+{
+	SkyPosition sp;
+
+	if (ui.comboBox_Catalog->currentIndex() > 0)
+	{
+		sp.SetLocation(Longitude, Latitude, Elevation);
+	}
+
+	int ira = ngc_ic_header.indexOf("RAJ2000");
+	int idec = ngc_ic_header.indexOf("DEJ2000");
+
+	QString t = text.toUpper();
+	if (ui.comboBox_Object->findText(t) < 0 && unique.tryAcquire())
+	{
+		if (ui.comboBox_Catalog->currentIndex() == 3)
+		{
+			t.remove(QRegExp("NGC ?"));
+			int num_ngc = t.toInt();
+			int first_ngc;
+			for (first_ngc = num_ngc - 10; NewGeneralCatalog.contains(first_ngc) == false; first_ngc++)
+				;
+			ui.comboBox_Object->clear();
+			int select = 0;
+			for (int ngc = first_ngc ; ui.comboBox_Object->count() < 20 && NewGeneralCatalog.contains(ngc) == true; ngc++)
+			{
+				double ra = NewGeneralCatalog[ngc][ira].toDouble() * 24.0 / 360.0;
+				double dec = NewGeneralCatalog[ngc][idec].toDouble();
+				sp.SetEquatorialCoord(ra, dec);
+				double alt = sp.GetAltitude();
+				if (alt >= 0)
+				{
+					ui.comboBox_Object->addItem(QString("NGC %1").arg(ngc), QVariant(ngc));
+				}
+				if (ngc == num_ngc) select = ngc;
+			}
+			ui.comboBox_Object->setCurrentIndex(select - first_ngc);
+		}
+		else if (ui.comboBox_Catalog->currentIndex() == 4)
+		{
+			t.remove(QRegExp("IC ?"));
+			int num_ic = t.toInt();
+			int first_ic;
+			for (first_ic = num_ic - 10; IndexCatalog.contains(first_ic) == false; first_ic++)
+				;
+			ui.comboBox_Object->clear();
+			int select = 0;
+			for (int ic = first_ic; ui.comboBox_Object->count() < 20 && IndexCatalog.contains(ic) == true; ic++)
+			{
+				double ra = IndexCatalog[ic][ira].toDouble() * 24.0 / 360.0;
+				double dec = IndexCatalog[ic][idec].toDouble();
+				sp.SetEquatorialCoord(ra, dec);
+				double alt = sp.GetAltitude();
+				if (alt >= 0)
+				{
+					ui.comboBox_Object->addItem(QString("IC %1").arg(ic), QVariant(ic));
+				}
+				if (ic == num_ic) select = ic;
+			}
+			ui.comboBox_Object->setCurrentIndex(select - first_ic);
+		}
+
+		unique.release();
+	}
 }
 
 void ZeGotoControlCenter::on_pushButton_Goto_clicked()

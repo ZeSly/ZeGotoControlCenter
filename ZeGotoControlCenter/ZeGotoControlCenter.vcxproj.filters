@@ -121,6 +121,15 @@
     <CustomBuild Include="Resources\stars.csv">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="Resources\messier.csv">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources\messiers.csv">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources\ngc_ic.csv">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_zegotocontrolcenter.h">
@@ -144,10 +153,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZeGotoControlCenter.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\messier.csv">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
