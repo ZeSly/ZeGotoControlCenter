@@ -7,14 +7,14 @@ void ZeGotoControlCenter::on_pushButton_GPS_OnOff_clicked()
 		// Set GPS ON
 		link->Command(":g+#");
 		ui.pushButton_GPS_OnOff->setText("GPS OFF");
-		ui.pushButton_GPS_OnOff->setDown(true);
+		ui.pushButton_GPS_OnOff->setChecked(true);
 	}
 	else
 	{
 		// set GPS OFF
 		link->Command(":g-#");
 		ui.pushButton_GPS_OnOff->setText("GPS ON");
-		ui.pushButton_GPS_OnOff->setDown(false);
+		ui.pushButton_GPS_OnOff->setChecked(false);
 	}
 }
 
@@ -24,11 +24,11 @@ void ZeGotoControlCenter::on_pushButton_RefreshSat_clicked()
 	{
 		TelescopePositionTimer.stop();
 		link->Command(":gps#");
-		ui.pushButton_RefreshSat->setDown(true);
+		ui.pushButton_RefreshSat->setChecked(true);
 	}
 	else
 	{
-		ui.pushButton_RefreshSat->setDown(false);
+		ui.pushButton_RefreshSat->setChecked(false);
 		if (!ui.pushButton_StopMonitor->isChecked())
 		{
 			TelescopePositionTimer.start();

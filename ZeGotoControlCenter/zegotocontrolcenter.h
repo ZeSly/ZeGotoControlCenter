@@ -55,6 +55,8 @@ public:
 	void on_pushButton_TrackingSolar_clicked();
 	void on_pushButton_TrackingCustom_clicked();
 	void on_pushButton_PierFlipNow_clicked();
+	void on_pushButton_DecreaseReticuleBrightness_clicked();
+	void on_pushButton_IncreaseReticuleBrightness_clicked();
 	void on_tabWidget_currentChanged(int index);
 
 	// park_tab.cpp

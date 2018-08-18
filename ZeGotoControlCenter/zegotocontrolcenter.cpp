@@ -2,6 +2,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QMap>
 #include "link.h"
 
 #include <Windows.h>
@@ -65,7 +66,8 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	lineEdit_GotoAltitude_textHasChanged(false),
 	lineEdit_GotoAzimuth_textHasChanged(false),
 	lineEdit_GotoDec_textHasChanged(false),
-	lineEdit_GotoRA_textHasChanged(false)
+	lineEdit_GotoRA_textHasChanged(false),
+	unique(1)
 {
 	ui.setupUi(this);
 	this->setFixedSize(this->size());
@@ -131,25 +133,46 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.comboBox_ManualSideOfPier->addItem(tr("East"));
 	ui.comboBox_ManualSideOfPier->addItem(tr("West"));
 
-	ui.pushButton_GPS_OnOff->setDown(true);
-	ui.pushButton_RefreshSat->setDown(false);
+	ui.pushButton_GPS_OnOff->setChecked(true);
+	ui.pushButton_RefreshSat->setChecked(false);
 
-	QFile stars_file("stars.csv");
-	if (stars_file.open((QIODevice::ReadOnly | QIODevice::Text)))
+	LoadCat("stars.csv", Stars);
+	LoadCat("messiers.csv", Messier);
+
+	QFile ngc_ic("ngc_ic.csv");
+	if (ngc_ic.open((QIODevice::ReadOnly | QIODevice::Text)))
 	{
-		while (!stars_file.atEnd())
+		bool first_line = true;
+		while (!ngc_ic.atEnd())
 		{
-			QString line = stars_file.readLine();
-			QStringList fields = line.trimmed().split('\t');
-			Stars << fields;
+			QString line = ngc_ic.readLine();
+			QStringList fields = line.trimmed().split(',');
+			if (first_line)
+			{
+				ngc_ic_header = fields;
+				first_line = false;
+			}
+			else
+			{
+				uint n = fields[1].toUInt();
+				if (fields[0] == "N" && !NewGeneralCatalog.contains(n))
+					NewGeneralCatalog[n] = fields;
+				if (fields[0] == "I" && !IndexCatalog.contains(n))
+					IndexCatalog[n] = fields;
+			}
 		}
-		stars_file.close();
+		ngc_ic.close();
 	}
 
-	QFile messier_file("messier.csv");
+	/*QFile messier_file("messier.csv");
 	if (messier_file.open((QIODevice::ReadOnly | QIODevice::Text)))
 	{
-		int idx_Object = 0, idx_Name = 0;
+		int idx_Object = 0;
+		int idx_Name = 0;
+		int idx_ra = 0;
+		int idx_dec = 0;
+		int ngc_ic_ra = ngc_ic_header.indexOf("RAJ2000");
+		int ngc_ic_dec = ngc_ic_header.indexOf("DEJ2000");
 		bool first_line = true;
 		QStringList prec;
 		while (!messier_file.atEnd())
@@ -161,13 +184,26 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 				first_line = false;
 				idx_Object = fields.indexOf("Object");
 				idx_Name = fields.indexOf("Name");
+				idx_ra = fields.indexOf("RAB2000");
+				idx_dec= fields.indexOf("DEB2000");
 			}
 			else
 			{
 				if (fields[idx_Name].at(0) == 'I')
-					fields[idx_Name] = fields[idx_Name].replace("I", "IC ");
+				{
+					uint n = fields[idx_Name].remove(0, 1).toUInt();
+					fields[idx_Name] = "IC " + fields[idx_Name];
+					fields[idx_ra] = IndexCatalog[n][ngc_ic_ra];
+					fields[idx_dec] = IndexCatalog[n][ngc_ic_dec];
+				}
 				else
+				{
+					uint n = fields[idx_Name].toUInt();
 					fields[idx_Name] = "NGC " + fields[idx_Name];
+					fields[idx_ra] = NewGeneralCatalog[n][ngc_ic_ra];
+					fields[idx_dec] = NewGeneralCatalog[n][ngc_ic_dec];
+				}
+
 				if (fields[idx_Object] == fields[0]) fields[idx_Object] = "";
 
 				if (!prec.isEmpty())
@@ -194,6 +230,21 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		Messier << prec;
 		messier_file.close();
 	}
+
+	QFile wr_messiers("messiers.csv");
+	if (wr_messiers.open(QFile::WriteOnly | QFile::Truncate))
+	{
+		QTextStream out(&wr_messiers);
+		for each (QStringList m in Messier)
+		{
+			for each (QString f in m)
+			{
+				out << f << "\t";
+			}
+			out << "\n";
+		}
+		wr_messiers.close();
+	}*/
 
 	ui.comboBox_Catalog->addItem(tr(""));
 	ui.comboBox_Catalog->addItem(tr("Stars"));
@@ -248,6 +299,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.comboBox_Object->setEnabled(enable);
 	ui.pushButton_Goto->setEnabled(enable);
 	ui.pushButton_Sync->setEnabled(enable);
+	ui.groupBox_ReticuleBrightness->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -300,7 +352,8 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 
 		ui.pushButton_Connect->setText(tr("Connect"));
 		ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
-		ui.pushButton_Connect->setDown(false);
+		//ui.pushButton_Connect->setDown(false);
+		ui.pushButton_Connect->setChecked(false);
 	}
 	else
 	{
@@ -341,7 +394,7 @@ void ZeGotoControlCenter::linkConnected()
 
 	ui.pushButton_Connect->setText(tr("Disconnect"));
 	ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-connect.png"));
-	ui.pushButton_Connect->setDown(true);
+	ui.pushButton_Connect->setChecked(true);
 	setConnectedWidgetEnabled(true);
 	ui.groupBox_Tracking->setTitle(tr("Tracking: sideral"));
 	ui.tabWidget->setCurrentIndex(0);
@@ -663,12 +716,12 @@ void ZeGotoControlCenter::on_pushButton_StopMonitor_clicked()
 	if (ui.pushButton_StopMonitor->isChecked())
 	{
 		TelescopePositionTimer.stop();
-		ui.pushButton_StopMonitor->setDown(true);
+		ui.pushButton_StopMonitor->setChecked(true);
 	}
 	else
 	{
 		TelescopePositionTimer.start();
-		ui.pushButton_StopMonitor->setDown(false);
+		ui.pushButton_StopMonitor->setChecked(false);
 	}
 }
 
@@ -815,6 +868,16 @@ void ZeGotoControlCenter::SyncDateTimeWithSystem()
 
 		Synched = true;
 	}
+}
+
+void ZeGotoControlCenter::on_pushButton_DecreaseReticuleBrightness_clicked()
+{
+	link->CommandBlind(":B-#");
+}
+
+void ZeGotoControlCenter::on_pushButton_IncreaseReticuleBrightness_clicked()
+{
+	link->CommandBlind(":B+#");
 }
 
 void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
