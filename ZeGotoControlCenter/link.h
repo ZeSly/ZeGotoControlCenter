@@ -31,6 +31,8 @@ public:
     void CommandBool(const char *command);
     void CommandBlind(const char *command);
 
+	bool IsCommandToSend();
+
 Q_SIGNALS:
     void connected();
     void error(QString msg);

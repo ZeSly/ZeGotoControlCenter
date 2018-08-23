@@ -196,6 +196,11 @@ void Link::CommandBlind(const char *command)
     Send(&Cmd);
 }
 
+bool Link::IsCommandToSend()
+{
+    return !commandStack.empty();
+}
+
 void Link::Send(T_LastCommand *cmd)
 {
     bool sent = false;
@@ -315,10 +320,9 @@ void Link::handleSocketTimeout()
 
 void Link::handleSerialPortError(QSerialPort::SerialPortError err)
 {
-    QSerialPort *serial = static_cast<QSerialPort*>(link);
+    if (err == 0) return;
 
-	if (serial->isOpen())
-		serial->close();
+    QSerialPort *serial = static_cast<QSerialPort*>(link);
 
     qDebug() << serial->error() << " " << serial->errorString();
     switch (err)
@@ -327,7 +331,7 @@ void Link::handleSerialPortError(QSerialPort::SerialPortError err)
         emit error(tr("Failed to open %1, error: %2").arg(serial->portName()).arg(serial->errorString()));
         break;
 
-    case QSerialPort::ReadError :
+    case QSerialPort::ReadError:
         emit error(tr("I/O error reading %1, error: %2").arg(serial->portName()).arg(serial->errorString()));
         break;
 
@@ -342,7 +346,7 @@ void Link::handleSerialPortError(QSerialPort::SerialPortError err)
         emit error(tr("I/O error %1, error: %2").arg(serial->portName()).arg(serial->errorString()));
         break;
     }
-	
+
 }
 
 void Link::handleSocketError(QAbstractSocket::SocketError err)

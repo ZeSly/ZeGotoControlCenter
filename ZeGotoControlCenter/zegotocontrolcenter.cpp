@@ -894,9 +894,12 @@ void ZeGotoControlCenter::on_pushButton_Bootloader_clicked()
 
 		TelescopePositionTimer.stop();
 
-		QEventLoop loop;
-		connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
-		loop.exec();
+		if (link->IsCommandToSend())
+		{
+			QEventLoop loop;
+			connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
+			loop.exec();
+		}
 
 		link->CommandBlind(cmd);
 		on_pushButton_Connect_clicked();
