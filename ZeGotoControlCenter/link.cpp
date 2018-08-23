@@ -78,7 +78,9 @@ Link::T_TypeCommand Link::TypesCommand[] =
 
 Link::Link(QString portName, QObject *parent) : QObject(parent)
 {
-    link = new QSerialPort(portName, this);
+	QSerialPort *serial = new QSerialPort(portName, this);
+	serial->setBaudRate(QSerialPort::Baud115200);
+	link = serial;
     connect(link, SIGNAL(readyRead()), SLOT(Receive()));
     connect(link, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(handleSerialPortError(QSerialPort::SerialPortError)));
     connect(&timer, SIGNAL(timeout()), SLOT(handleSerialPortTimeout()));
@@ -100,6 +102,7 @@ Link::~Link(void)
 {
     if (link->isOpen())
     {
+		link->waitForBytesWritten(100);
         link->close();
         qDebug() << "Disconnected";
     }
@@ -288,7 +291,10 @@ void Link::Receive()
             }
             while (!commandStack.isEmpty() && Cmd.Type == LINK_TYPE_BLIND);
         }
-
+		else
+		{
+			emit nothing_to_send();
+		}
     }
     else if (!timer.isActive())
     {
@@ -309,7 +315,10 @@ void Link::handleSocketTimeout()
 
 void Link::handleSerialPortError(QSerialPort::SerialPortError err)
 {
-    QSerialPort *serial = (QSerialPort*)link;
+    QSerialPort *serial = static_cast<QSerialPort*>(link);
+
+	if (serial->isOpen())
+		serial->close();
 
     qDebug() << serial->error() << " " << serial->errorString();
     switch (err)
@@ -333,11 +342,12 @@ void Link::handleSerialPortError(QSerialPort::SerialPortError err)
         emit error(tr("I/O error %1, error: %2").arg(serial->portName()).arg(serial->errorString()));
         break;
     }
+	
 }
 
 void Link::handleSocketError(QAbstractSocket::SocketError err)
 {
-    QTcpSocket *socket = (QTcpSocket*)link;
+    QTcpSocket *socket = static_cast<QTcpSocket*>(link);
 
     qDebug() << socket->error() << " " << socket->errorString();
     //switch (err)

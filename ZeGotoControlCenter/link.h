@@ -35,6 +35,7 @@ Q_SIGNALS:
     void connected();
     void error(QString msg);
     void response(const char *command, const char *resp);
+	void nothing_to_send();
 
 private slots:
     void handleConnect();

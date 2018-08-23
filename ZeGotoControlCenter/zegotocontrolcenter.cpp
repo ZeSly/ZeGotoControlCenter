@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QMap>
+#include <QThread>
 #include "link.h"
 
 #include <Windows.h>
@@ -84,7 +85,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 		ui.comboBox_ConnectionType->addItem(portFullName, serialPortInfo.portName());
 	}
 
-	TelescopePositionTimer.setInterval(1000);
+	TelescopePositionTimer.setInterval(5000);
 	connect(&TelescopePositionTimer, SIGNAL(timeout()), SLOT(on_TelescopePositionTime()));
 	connect(&PierFlipAlertTimer, SIGNAL(timeout()), SLOT(on_PierFlipAlertTimer()));
 	connect(QApplication::instance(), SIGNAL(showUp()), SLOT(on_SingleInstance()));
@@ -300,6 +301,7 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.pushButton_Goto->setEnabled(enable);
 	ui.pushButton_Sync->setEnabled(enable);
 	ui.groupBox_ReticuleBrightness->setEnabled(enable);
+	ui.pushButton_Bootloader->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -310,6 +312,7 @@ void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const Q
 		ui.lineEdit_IPAddress->setEnabled(true);
 		ui.label_IPPort->setEnabled(true);
 		ui.lineEdit_IPPort->setEnabled(true);
+		ui.pushButton_Bootloader->setVisible(false);
 	}
 	else
 	{
@@ -317,6 +320,7 @@ void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const Q
 		ui.lineEdit_IPAddress->setEnabled(false);
 		ui.label_IPPort->setEnabled(false);
 		ui.lineEdit_IPPort->setEnabled(false);
+		ui.pushButton_Bootloader->setVisible(true);
 	}
 	
 	if (ASCOMServer != NULL)
@@ -360,10 +364,12 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 		QString portName = ui.comboBox_ConnectionType->currentData().toString();
 		if (portName != "IP")
 		{
+			TelescopePositionTimer.setInterval(5000);
 			link = new Link(portName);
 		}
 		else
 		{
+			TelescopePositionTimer.setInterval(1000);
 			link = new Link(ui.lineEdit_IPAddress->text(), ui.lineEdit_IPPort->text().toInt());
 		}
 
@@ -878,6 +884,23 @@ void ZeGotoControlCenter::on_pushButton_DecreaseReticuleBrightness_clicked()
 void ZeGotoControlCenter::on_pushButton_IncreaseReticuleBrightness_clicked()
 {
 	link->CommandBlind(":B+#");
+}
+
+void ZeGotoControlCenter::on_pushButton_Bootloader_clicked()
+{
+	if (link != NULL)
+	{
+		char cmd[] = { 4, 0 };
+
+		TelescopePositionTimer.stop();
+
+		QEventLoop loop;
+		connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
+		loop.exec();
+
+		link->CommandBlind(cmd);
+		on_pushButton_Connect_clicked();
+	}
 }
 
 void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)
