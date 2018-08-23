@@ -357,8 +357,8 @@ void ZeGotoControlCenter::on_pushButton_Goto_clicked()
 
 	if (QMessageBox::question(this, tr("Goto to equatoriale coordinates"), QString("The telescope will got to\n%1 %2\nAre you sure ?").arg(sRA).arg(sDec)) == QMessageBox::Yes)
 	{
-		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#')).toLocal8Bit();
-		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace('s', '#')).toLocal8Bit();
+		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#').remove(' ')).toLocal8Bit();
+		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace("''", "#").remove(' ')).toLocal8Bit();
 		char *cmd = cmd_RA.data();
 		link->Command(cmd);
 		cmd = cmd_Dec.data();
@@ -374,8 +374,8 @@ void ZeGotoControlCenter::on_pushButton_Sync_clicked()
 
 	if (QMessageBox::question(this, tr("Sync to equatoriale coordinates"), QString("Confirm the telescope is pointing to\n%1 %2\n").arg(sRA).arg(sDec)) == QMessageBox::Yes)
 	{
-		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#')).toLocal8Bit();
-		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace('s', '#')).toLocal8Bit();
+		QByteArray cmd_RA = QString(":Sr%1").arg(sRA.replace('s', '#').remove(' ')).toLocal8Bit();
+		QByteArray cmd_Dec = QString(":Sd%1").arg(sDec.replace("''", "#").remove(' ')).toLocal8Bit();
 		char *cmd = cmd_RA.data();
 		link->Command(cmd);
 		cmd = cmd_Dec.data();
