@@ -2,7 +2,7 @@
 #include "GPSStatusFrame.h"
 
 GPSStatusFrame::GPSStatusFrame(QWidget *parent)
-	: QFrame(parent)
+	: QFrame(parent), SatellitesInView(0)
 {
 	setAutoFillBackground(true);
 }

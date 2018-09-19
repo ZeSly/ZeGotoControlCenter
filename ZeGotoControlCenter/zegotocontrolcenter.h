@@ -19,7 +19,7 @@ class ZeGotoControlCenter : public QMainWindow
 	Q_OBJECT
 
 public:
-	ZeGotoControlCenter(QWidget *parent = 0);
+	explicit ZeGotoControlCenter(QWidget *parent = 0);
 	~ZeGotoControlCenter();
 
 	private slots:

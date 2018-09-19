@@ -14,7 +14,7 @@
 
 class SingleApplicationPrivate {
 public:
-    SingleApplicationPrivate(SingleApplication *q_ptr) : q_ptr(q_ptr) { }
+    explicit SingleApplicationPrivate(SingleApplication *q_ptr) : q_ptr(q_ptr), memory(nullptr), server(nullptr), socket(nullptr) { }
 
     void startServer(QString &serverName)
     {

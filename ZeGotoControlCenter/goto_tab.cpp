@@ -396,7 +396,6 @@ void ZeGotoControlCenter::GotoEd2AltAz()
 	if (fields.size() > 2) s = fields[2].toDouble();
 	double ra = h + m / 60.0 + s / 3600.0;
 
-	h = 0;
 	m = 0;
 	s = 0;
 	fields = ui.lineEdit_GotoDec->text().split(QRegExp("[^0-9]+"));
@@ -425,7 +424,6 @@ void ZeGotoControlCenter::GotoAltAz2Ed()
 	if (fields.size() > 2) s = fields[2].toDouble();
 	double az = d + m / 60.0 + s / 3600.0;
 
-	d = 0;
 	m = 0;
 	s = 0;
 	fields = ui.lineEdit_GotoAltitude->text().split(QRegExp("[^0-9]+"));

@@ -12,7 +12,6 @@ void ZeGotoControlCenter::on_pushButton_Unpark_clicked()
 
 void ZeGotoControlCenter::on_comboBox_ParkPositions_currentIndexChanged()
 {
-    char cmd[8];
     int park_index = ui.comboBox_ParkPositions->currentIndex();
     bool enable = (park_index == 3);
 
@@ -22,7 +21,9 @@ void ZeGotoControlCenter::on_comboBox_ParkPositions_currentIndexChanged()
 
     if (park_index < 3)
     {
-        sprintf(cmd, ":hS%u#", park_index + 1);
+        char cmd[8];
+
+        sprintf(cmd, ":hS%i#", park_index + 1);
         link->CommandBlind(cmd);
     }
 }

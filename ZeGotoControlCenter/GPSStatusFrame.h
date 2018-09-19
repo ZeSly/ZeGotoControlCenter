@@ -25,7 +25,7 @@ class GPSStatusFrame : public QFrame
 	Q_OBJECT
 
 public:
-	GPSStatusFrame(QWidget *parent = 0);
+	explicit GPSStatusFrame(QWidget *parent = 0);
 	void SetSatellitesInView(int);
 	void AddSatellites(Satellite &);
 	QString text;

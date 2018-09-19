@@ -12,17 +12,17 @@ char *GetMyVersion()
 {
 	static char szResult[256] = { 0 };
 	TCHAR szFullPath[256];
-	TCHAR szGetName[256];
 	DWORD dwVerInfoSize; // Size of version information block
 	DWORD dwVerHnd = 0; // An 'ignored' parameter, always '0'
 	UINT uVersionLen;
-	BOOL bRetCode;
 	VS_FIXEDFILEINFO *FixedFileInfo;
 
 	GetModuleFileName(NULL, szFullPath, sizeof(szFullPath));
 	dwVerInfoSize = GetFileVersionInfoSize(szFullPath, &dwVerHnd);
 	if (dwVerInfoSize)
 	{
+	    TCHAR szGetName[256];
+	    BOOL bRetCode;
 		LPSTR lpstrVffInfo;
 		HANDLE hMem;
 		hMem = GlobalAlloc(GMEM_MOVEABLE, dwVerInfoSize);
