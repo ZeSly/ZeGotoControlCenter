@@ -1,20 +1,20 @@
 #include "SkyPosition.h"
 #include <time.h>
-#include <amp_math.h>
+#include <math.h>
 
 #define PI 3.14159265358979323846
 #define DEGREES(a) (a * PI / 180.0)
 
 double SkyPosition::ComputeSideralTime()
 {
-	tm the_time;
-	__time64_t long_time;
+	tm *the_time;
+	time_t long_time;
 
-	_time64(&long_time);
-	_gmtime64_s(&the_time, &long_time);
+	time(&long_time);
+	the_time = gmtime(&long_time);
 
-	double year = the_time.tm_year + 1900.0;
-	double month = the_time.tm_mon + 1.0;
+	double year = the_time->tm_year + 1900.0;
+	double month = the_time->tm_mon + 1.0;
 	if (month < 3)
 	{
 		year -= 1;
@@ -23,10 +23,10 @@ double SkyPosition::ComputeSideralTime()
 
 	double c = floor(year / 100);
 	double b = 2 - c + floor(c / 4);
-	double t = (double)the_time.tm_hour / 24.0 + (double)the_time.tm_min / 1440.0 + (double)the_time.tm_sec / 86400.0;
-	JulianDay = floor(365.25 * (year + 4716)) + floor(30.6001 * (month + 1)) + (double)the_time.tm_mday + t + b - 1524.5;
+	double t = (double)the_time->tm_hour / 24.0 + (double)the_time->tm_min / 1440.0 + (double)the_time->tm_sec / 86400.0;
+	JulianDay = floor(365.25 * (year + 4716)) + floor(30.6001 * (month + 1)) + (double)the_time->tm_mday + t + b - 1524.5;
 
-	double h = the_time.tm_hour + the_time.tm_min / 60.0 + the_time.tm_sec / 3600.0;
+	double h = the_time->tm_hour + the_time->tm_min / 60.0 + the_time->tm_sec / 3600.0;
 	double n = JulianDay - 2415384.5;
 	double ts = 23750.3 + 236.555362 * n;
 	double tsmh_h = ts / 3600.0 + h - (Longitude / 15.0);

@@ -1,4 +1,4 @@
-#include <Windows.h>
+//#include <Windows.h>
 #include "zegotocontrolcenter.h"
 #include <QMessageBox>
 #include <QTcpSocket>

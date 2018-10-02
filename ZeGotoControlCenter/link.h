@@ -1,7 +1,7 @@
 #ifndef LINK_H
 #define LINK_H
 
-#include <QtSerialPort\QSerialPort>
+#include <QtSerialPort/QSerialPort>
 #include <QTcpSocket>
 #include <QTimer>
 #include <QList>

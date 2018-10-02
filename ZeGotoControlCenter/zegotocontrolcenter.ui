@@ -155,7 +155,7 @@ QComboBox
 QComboBox:editable
 {
     background: #500;
-    color: #White;
+    color: White;
 }
 
 QComboBox:!editable, QComboBox::drop-down:editable
@@ -3737,7 +3737,7 @@ with system time on connect</string>
   <customwidget>
    <class>GPSStatusFrame</class>
    <extends>QFrame</extends>
-   <header>gpsstatusframe.h</header>
+   <header>GPSStatusFrame.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

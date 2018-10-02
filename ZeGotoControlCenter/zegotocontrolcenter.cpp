@@ -5,7 +5,10 @@
 #include <QMap>
 #include <QThread>
 #include "link.h"
+#include <limits>
 
+
+#ifdef WIN32
 #include <Windows.h>
 
 char *GetMyVersion()
@@ -31,7 +34,7 @@ char *GetMyVersion()
 		GetFileVersionInfo(szFullPath, dwVerHnd, dwVerInfoSize, lpstrVffInfo);
 
 		// Get a codepage from base_file_info_sctructure
-		lstrcpy(szGetName, L"\\");
+		lstrcpy(szGetName, "\\");
 		uVersionLen = 0;
 
 		bRetCode = VerQueryValue((LPVOID)lpstrVffInfo,
@@ -58,18 +61,21 @@ char *GetMyVersion()
 	return szResult;
 
 }
+#undef max
+#endif
 
 ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	: QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-	Latitude(DBL_MAX),
-	Longitude(DBL_MAX),
-	Elevation(DBL_MAX),
-	lineEdit_GotoAltitude_textHasChanged(false),
+    Latitude(std::numeric_limits<double>::max()),
+    Longitude(std::numeric_limits<double>::max()),
+    Elevation(std::numeric_limits<double>::max()),
+    lineEdit_GotoAltitude_textHasChanged(false),
 	lineEdit_GotoAzimuth_textHasChanged(false),
 	lineEdit_GotoDec_textHasChanged(false),
 	lineEdit_GotoRA_textHasChanged(false),
 	unique(1)
 {
+
 	ui.setupUi(this);
 	this->setFixedSize(this->size());
 	ui.statusBar->setSizeGripEnabled(false);
@@ -95,7 +101,9 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.lineEdit_ParkPositionAlt->setEnabled(false);
 	ui.lineEdit_ParkPositionAz->setEnabled(false);
 
+#ifdef WIN32
 	ui.label_OGCCVersion->setText(GetMyVersion());
+#endif
 
 	ui.lineEdit_IPAddress->setText(settings.value("IPAddress").toString());
 	ui.lineEdit_IPPort->setText(settings.value("IPPort").toString());

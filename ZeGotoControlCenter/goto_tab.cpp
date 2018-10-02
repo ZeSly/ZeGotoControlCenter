@@ -1,3 +1,4 @@
+#include <math.h>
 #include "zegotocontrolcenter.h"
 #include <QMessageBox>
 #include <QFile>
@@ -71,7 +72,7 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 
 		bool first = true;
 		int idx = 0;
-		for each (QStringList star in Stars)
+		foreach (QStringList star, Stars)
 		{
 			if (!first)
 			{
@@ -107,7 +108,7 @@ void ZeGotoControlCenter::on_comboBox_Catalog_currentIndexChanged()
 
 		bool first = true;
 		int idx = 0;
-		for each (QStringList messier in Messier)
+		foreach (QStringList messier, Messier)
 		{
 			if (!first)
 			{

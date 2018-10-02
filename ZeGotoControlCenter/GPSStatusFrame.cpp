@@ -1,3 +1,4 @@
+#include <math.h>
 #include <QPainter>
 #include "GPSStatusFrame.h"
 
