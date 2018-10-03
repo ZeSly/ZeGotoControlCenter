@@ -31,7 +31,11 @@ QString _Dec2DMS(double d, bool h)
 
 void ZeGotoControlCenter::LoadCat(QString filename, QVector<QStringList> &cat)
 {
+#ifdef LINUX
+	QFile file(QString("/usr/local/lib/ZeGotoControlCenter") + filename);
+#else	
 	QFile file(filename);
+#endif
 	if (file.open((QIODevice::ReadOnly | QIODevice::Text)))
 	{
 		while (!file.atEnd())
