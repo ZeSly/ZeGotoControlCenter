@@ -32,7 +32,7 @@ QString _Dec2DMS(double d, bool h)
 void ZeGotoControlCenter::LoadCat(QString filename, QVector<QStringList> &cat)
 {
 #ifdef LINUX
-	QFile file(QString("/usr/local/lib/ZeGotoControlCenter") + filename);
+	QFile file(QString(DATA_DIR) + filename);
 #else	
 	QFile file(filename);
 #endif

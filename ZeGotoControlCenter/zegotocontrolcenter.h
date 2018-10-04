@@ -12,6 +12,11 @@
 #include "ui_zegotocontrolcenter.h"
 #include "link.h"
 
+#ifdef linux
+#include "linux.h"
+#include "build_number.h"
+#endif
+
 #define ASCOM_SERVER_PORT 5085      // my EM200 serial number ;)
 
 class ZeGotoControlCenter : public QMainWindow
