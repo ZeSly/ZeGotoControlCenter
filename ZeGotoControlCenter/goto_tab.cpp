@@ -24,7 +24,7 @@ QString _Dec2DMS(double d, bool h)
 	}
 	else
 	{
-		ret = QString::fromLatin1("%1° %2' %3''").arg(deg, 0, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
+		ret = QString::fromLatin1("%1%2° %3' %4''").arg(d < 0 ? "-" : "+").arg(deg, 0, 'f', 0, '0').arg(min, 2, 'f', 0, '0').arg(sec, 2, 'f', 2, '0');
 	}
 	return ret;
 }
