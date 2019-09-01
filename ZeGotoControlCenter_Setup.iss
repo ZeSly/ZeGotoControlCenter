@@ -28,6 +28,7 @@ Compression=lzma
 SolidCompression=yes
 UninstallFilesDir="{app}\Uninstall"
 OutputDir=.
+LicenseFile="Licence_CeCILL_V2.1-en.txt"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -47,6 +48,8 @@ Source: "Win32\Release\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flag
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Flags: ignoreversion solidbreak
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Telescope.dll"; DestDir: "{app}"; Flags: ignoreversion
+; Firmware
+Source: "D:\Users\ZeSly\MPLABXProjects\ZeGoto.X\release\*.hex"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
