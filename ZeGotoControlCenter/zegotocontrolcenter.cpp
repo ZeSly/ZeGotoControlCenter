@@ -1,9 +1,11 @@
 #include "zegotocontrolcenter.h"
+#include "firmwareupdate.h"
 #include <QtSerialPort/QSerialPortInfo>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QMap>
 #include <QThread>
+#include <QFileDialog>
 #include "link.h"
 #include <limits>
 
@@ -548,7 +550,7 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 	{
 		QString side_of_pier = QString(response).remove('#');
 		ui.label_PierSideValue->setText(side_of_pier);
-		if (side_of_pier == "West")
+		if (side_of_pier.startsWith("West"))
 		{
 			PierSide = WEST;
 			ui.comboBox_ManualSideOfPier->setCurrentIndex(1);
@@ -592,6 +594,15 @@ void ZeGotoControlCenter::linkResponse(const char *command, const char *response
 		double voltage = strtod(response, NULL);
 		ui.label_MainVoltageValue->setText(QString("%1 V").arg(voltage, 0, 'f', 1));
 	}
+
+    else if (strcmp(":MS#", command) == 0)
+    {
+        if (*response != '0')
+        {
+            QString msg(response + 1);
+            QMessageBox::critical(this, "Goto rejected", msg.remove("#"));
+        }
+    }
 
 	int flip_in_secs;
 	if (PierSide == EAST)
@@ -896,22 +907,31 @@ void ZeGotoControlCenter::on_pushButton_IncreaseReticuleBrightness_clicked()
 
 void ZeGotoControlCenter::on_pushButton_Bootloader_clicked()
 {
-	if (link != NULL)
-	{
-		char cmd[] = { 4, 0 };
+    if (link != NULL)
+    {
+        QString newFileName = QFileDialog::getOpenFileName(this, "Open Hex File", "", "Hex Files (*.hex *.ehx)");
 
-		TelescopePositionTimer.stop();
+        if (!newFileName.isEmpty())
+        {
+            char cmd[] = { 4, 0 };
 
-		if (link->IsCommandToSend())
-		{
-			QEventLoop loop;
-			connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
-			loop.exec();
-		}
+            TelescopePositionTimer.stop();
 
-		link->CommandBlind(cmd);
-		on_pushButton_Connect_clicked();
-	}
+            if (link->IsCommandToSend())
+            {
+                QEventLoop loop;
+                connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
+                loop.exec();
+            }
+
+            link->CommandBlind(cmd);
+            on_pushButton_Connect_clicked();
+
+
+            FirmwareUpdate firmwareUpdate(newFileName, this);
+            firmwareUpdate.exec();
+        }
+    }
 }
 
 void ZeGotoControlCenter::on_tabWidget_currentChanged(int index)

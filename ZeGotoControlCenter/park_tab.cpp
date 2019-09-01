@@ -2,12 +2,12 @@
 
 void ZeGotoControlCenter::on_pushButton_Park_clicked()
 {
-    link->CommandBlind(":hP#");
+    link->CommandString(":hP#");
 }
 
 void ZeGotoControlCenter::on_pushButton_Unpark_clicked()
 {
-    link->CommandBlind(":hW#");
+    link->CommandString(":hW#");
 }
 
 void ZeGotoControlCenter::on_comboBox_ParkPositions_currentIndexChanged()
