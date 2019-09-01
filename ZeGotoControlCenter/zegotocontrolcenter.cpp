@@ -105,6 +105,8 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 
 #ifdef WIN32
 	ui.label_OGCCVersion->setText(GetMyVersion());
+#else
+	ui.label_OGCCVersion->setText(QString("%1.%2").arg(VERSION).arg(BUILD_NUMBER));
 #endif
 
 	ui.lineEdit_IPAddress->setText(settings.value("IPAddress").toString());
