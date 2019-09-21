@@ -117,7 +117,7 @@ void ZeGotoControlCenter::on_lineEdit_PierFlipPictureFolder_editingFinished()
 
 void ZeGotoControlCenter::on_comboBox_ManualSideOfPier_currentIndexChanged(int index)
 {
-	if (link != NULL && ui.radioButton_PierFlipManual->isChecked())
+	if (link != NULL && !ui.radioButton_PierFlipAutomatic->isChecked())
 	{
 		if (index == 0)
 		{

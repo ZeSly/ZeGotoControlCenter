@@ -89,6 +89,20 @@ void ZeGotoControlCenter::DecodeGPSFrame(const char *f)
 	static QString Latitude, Longitude, Altitude;
 	static int SatellitesInView = 0;
 	static int SatellitesInUse = 0;
+    unsigned char checksum = -1, chk = 0;
+
+    const char *p = f + 1;
+    while (*p != '*' && *p != 0)
+    {
+        chk ^= (unsigned char)*p;
+        p++;
+    }
+    if (*p == '*')
+    {
+        checksum = (char)strtol(p + 1, NULL, 16);
+        if (checksum != chk)
+            return;
+    }
 
 	if (fields[0] == "$GPGGA")
 	{
