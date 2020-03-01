@@ -67,14 +67,15 @@ char *GetMyVersion()
 #endif
 
 ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
-	: QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+    : QMainWindow(parent, Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
     Latitude(std::numeric_limits<double>::max()),
     Longitude(std::numeric_limits<double>::max()),
     Elevation(std::numeric_limits<double>::max()),
     lineEdit_GotoAltitude_textHasChanged(false),
-	lineEdit_GotoAzimuth_textHasChanged(false),
-	lineEdit_GotoDec_textHasChanged(false),
-	lineEdit_GotoRA_textHasChanged(false),
+    lineEdit_GotoAzimuth_textHasChanged(false),
+    lineEdit_GotoDec_textHasChanged(false),
+    lineEdit_GotoRA_textHasChanged(false),
+    TryReconnect(false),
 	unique(1)
 {
 
@@ -83,7 +84,7 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 	ui.statusBar->setSizeGripEnabled(false);
 	systrayIcon.setIcon(QIcon(":/Images/Resources/em200_32.png"));
 
-	link = NULL;
+    link.reset(new Link(this));
 	ASCOMServer = NULL;
 
 	ui.comboBox_ConnectionType->addItem("TCP/IP", "IP");
@@ -271,7 +272,6 @@ ZeGotoControlCenter::ZeGotoControlCenter(QWidget *parent)
 ZeGotoControlCenter::~ZeGotoControlCenter()
 {
 	TelescopePositionTimer.stop();
-	if (link != NULL) delete link;
 }
 
 void ZeGotoControlCenter::closeEvent(QCloseEvent *event)
@@ -313,7 +313,6 @@ void ZeGotoControlCenter::setConnectedWidgetEnabled(bool enable)
 	ui.pushButton_Goto->setEnabled(enable);
 	ui.pushButton_Sync->setEnabled(enable);
 	ui.groupBox_ReticuleBrightness->setEnabled(enable);
-	ui.pushButton_Bootloader->setEnabled(enable);
 }
 
 void ZeGotoControlCenter::on_comboBox_ConnectionType_currentIndexChanged(const QString &arg1)
@@ -358,17 +357,20 @@ void ZeGotoControlCenter::on_checkBox_SyncDateTime_toggled(bool checked)
 
 void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 {
-	if (link != NULL)
+    if (!TryReconnect)
+    {
+        ui.statusBar->clearMessage();
+    }
+
+	if (link->IsConnected())
 	{
 		TelescopePositionTimer.stop();
-		delete link;
-		link = NULL;
+		link->Disconnect();
 
 		setConnectedWidgetEnabled(false);
 
 		ui.pushButton_Connect->setText(tr("Connect"));
 		ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
-		//ui.pushButton_Connect->setDown(false);
 		ui.pushButton_Connect->setChecked(false);
 	}
 	else
@@ -377,17 +379,17 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 		if (portName != "IP")
 		{
 			TelescopePositionTimer.setInterval(5000);
-			link = new Link(portName);
+			link->Open(portName);
 		}
 		else
 		{
 			TelescopePositionTimer.setInterval(1000);
-			link = new Link(ui.lineEdit_IPAddress->text(), ui.lineEdit_IPPort->text().toInt());
+			link->Open(ui.lineEdit_IPAddress->text(), ui.lineEdit_IPPort->text().toInt());
 		}
 
-		connect(link, SIGNAL(connected()), this, SLOT(linkConnected()));
-		connect(link, SIGNAL(error(QString)), this, SLOT(showError(QString)));
-		connect(link, SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
+		connect(link.get(), SIGNAL(connected()), this, SLOT(linkConnected()));
+		connect(link.get(), SIGNAL(error(QString)), this, SLOT(showError(QString)));
+		connect(link.get(), SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
 
 		link->Connect();
 	}
@@ -396,6 +398,11 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 void ZeGotoControlCenter::linkConnected()
 {
 	Synched = false;
+    if (TryReconnect)
+    {
+        ui.statusBar->showMessage(tr("Reconnected"));
+        TryReconnect = false;
+    }
 
 	link->CommandBlind(":U#");       // Switch to high precision
 	link->CommandString(":GVN#");    // Get Telescope Firmware Number
@@ -439,11 +446,23 @@ void ZeGotoControlCenter::linkConnected()
 
 void ZeGotoControlCenter::showError(QString msg)
 {
-	QMessageBox::critical(this, tr("Communication error"), msg);
 	TelescopePositionTimer.stop();
-	on_pushButton_Connect_clicked();
-	//delete link;
-	//link = NULL;
+    link->Disconnect();
+    //if (!TryReconnect)
+    {
+        //QMessageBox *msgBox = new QMessageBox(this);
+        //msgBox->setIcon(QMessageBox::Warning);
+        //msgBox->setWindowTitle(tr("Communication error"));
+        //msgBox->setText(msg);
+        //msgBox->setAttribute(Qt::WA_DeleteOnClose); // delete pointer after close
+        //msgBox->setModal(false);
+        //msgBox->show();
+
+        ui.statusBar->showMessage(msg);
+    }
+    qDebug() << __FUNCTION__ << ": " << msg;
+    TryReconnect = true;
+    link->Connect();
 }
 
 void ZeGotoControlCenter::linkResponse(const char *command, const char *response)
@@ -820,7 +839,11 @@ void ZeGotoControlCenter::on_verticalSlider_Speed_sliderReleased()
 
 void ZeGotoControlCenter::on_pushButton_TrackingStop_clicked()
 {
-	ui.groupBox_Tracking->setTitle(tr("Tracking: stopped"));
+    if (link != NULL)
+    {
+        link->CommandBlind(":TH#");
+    }
+    ui.groupBox_Tracking->setTitle(tr("Tracking: stopped"));
 }
 
 void ZeGotoControlCenter::on_pushButton_TrackingSideral_clicked()
@@ -922,7 +945,7 @@ void ZeGotoControlCenter::on_pushButton_Bootloader_clicked()
             if (link->IsCommandToSend())
             {
                 QEventLoop loop;
-                connect(link, SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
+                connect(link.get(), SIGNAL(nothing_to_send()), &loop, SLOT(quit()));
                 loop.exec();
             }
 

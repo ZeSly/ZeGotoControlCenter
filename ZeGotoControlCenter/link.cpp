@@ -69,52 +69,53 @@ Link::T_TypeCommand Link::TypesCommand[] =
     { ":U", LINK_TYPE_BLIND },
     { ":P", LINK_TYPE_STRING },
     { ":V", LINK_TYPE_STRING },
+    { ":TL", LINK_TYPE_BLIND },
+    { ":TQ", LINK_TYPE_BLIND },
+    { ":TS", LINK_TYPE_BLIND },
+    { ":TH", LINK_TYPE_BLIND },
     { ":GIP", LINK_TYPE_STRING },
     { ":SIP", LINK_TYPE_STRING },
 
 	{ "END", LINK_TYPE_BLIND}
 };
 
-
-Link::Link(QString portName, QObject *parent) : QObject(parent)
+Link::Link(QObject *parent) : QObject(parent), link(nullptr)
 {
-	QSerialPort *serial = new QSerialPort(portName, this);
-	serial->setBaudRate(QSerialPort::Baud115200);
-	link = serial;
-    connect(link, SIGNAL(readyRead()), SLOT(Receive()));
-    connect(link, SIGNAL(error(QSerialPort::SerialPortError)), SLOT(handleSerialPortError(QSerialPort::SerialPortError)));
-    connect(&timer, SIGNAL(timeout()), SLOT(handleSerialPortTimeout()));
-}
 
-Link::Link(QString Address, qint16 Port, QObject *parent) : QObject(parent)
-{
-    AddressIP = Address;
-    PortIP = Port;
-
-    link = new QTcpSocket(this);
-    connect(link, SIGNAL(connected()), this, SLOT(handleConnect()));
-    connect(link, SIGNAL(readyRead()), this, SLOT(Receive()));
-    connect(link, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
-    connect(&timer, SIGNAL(timeout()), SLOT(handleSocketTimeout()));
 }
 
 Link::~Link(void)
 {
-    if (link->isOpen())
-    {
-		link->waitForBytesWritten(100);
-        link->close();
-        qDebug() << "Disconnected";
-    }
+    Disconnect();
+}
 
-    delete link;
+void Link::Open(QString portName)
+{
+	QSerialPort *serial = new QSerialPort(portName, this);
+	serial->setBaudRate(QSerialPort::Baud115200);
+	link.reset(serial);
+    connect(link.get(), SIGNAL(readyRead()), SLOT(Receive()));
+    connect(link.get(), SIGNAL(error(QSerialPort::SerialPortError)), SLOT(handleSerialPortError(QSerialPort::SerialPortError)));
+    connect(&timer, SIGNAL(timeout()), SLOT(handleSerialPortTimeout()));
+}
+
+void Link::Open(QString Address, qint16 Port)
+{
+    AddressIP = Address;
+    PortIP = Port;
+
+    link.reset(new QTcpSocket(this));
+    connect(link.get(), SIGNAL(connected()), this, SLOT(handleConnect()));
+    connect(link.get(), SIGNAL(readyRead()), this, SLOT(Receive()));
+    connect(link.get(), SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(handleSocketError(QAbstractSocket::SocketError)));
+    connect(&timer, SIGNAL(timeout()), SLOT(handleSocketTimeout()));
 }
 
 void Link::Connect()
 {
-    if (typeid(*link) == typeid(QSerialPort))
+    QSerialPort *serial = dynamic_cast<QSerialPort*>(link.get());
+    if (serial != nullptr)
     {
-        QSerialPort *serial = (QSerialPort*)link;
         if (serial->open(QIODevice::ReadWrite))
         {
             serial->clear();
@@ -122,13 +123,32 @@ void Link::Connect()
             emit connected();
         }
     }
-
-    if (typeid(*link) == typeid(QTcpSocket))
+    else
     {
-        QTcpSocket *socket = (QTcpSocket*)link;
-        socket->abort();
-        socket->connectToHost(AddressIP, PortIP);
+        QTcpSocket *socket = dynamic_cast<QTcpSocket*>(link.get());
+        if (socket != nullptr)
+        {
+
+            socket->abort();
+            socket->connectToHost(AddressIP, PortIP);
+        }
     }
+}
+
+void Link::Disconnect()
+{
+    commandStack.clear();
+    if (link && link->isOpen())
+    {
+        link->waitForBytesWritten(100);
+        link->close();
+        qDebug() << "Disconnected";
+    }
+}
+
+bool Link::IsConnected()
+{
+    return link && link->isOpen();
 }
 
 void Link::handleConnect()
@@ -205,25 +225,28 @@ void Link::Send(T_LastCommand *cmd)
 {
     bool sent = false;
 
-	if (!commandStack.isEmpty() && commandStack.first().Type == LINK_TYPE_GPS)
-	{
-		commandStack.removeFirst();
-	}
-
-    if (commandStack.isEmpty())
+    if (link)
     {
-        qDebug() << "TX: " << cmd->Command;
-        link->write(cmd->Command);
-        if (cmd->Type != LINK_TYPE_BLIND)
+        if (!commandStack.isEmpty() && commandStack.first().Type == LINK_TYPE_GPS)
         {
-            timer.start(10000);
+            commandStack.removeFirst();
         }
-        sent = true;
-    }
 
-    if (!sent || cmd->Type != LINK_TYPE_BLIND)
-    {
-        commandStack.append(*cmd);
+        if (commandStack.isEmpty())
+        {
+            qDebug() << "TX: " << cmd->Command;
+            link->write(cmd->Command);
+            if (cmd->Type != LINK_TYPE_BLIND)
+            {
+                timer.start(10000);
+            }
+            sent = true;
+        }
+
+        if (!sent || cmd->Type != LINK_TYPE_BLIND)
+        {
+            commandStack.append(*cmd);
+        }
     }
 }
 
@@ -309,7 +332,7 @@ void Link::Receive()
 
 void Link::handleSerialPortTimeout()
 {
-    QSerialPort *serial = (QSerialPort*)link;
+    QSerialPort *serial = dynamic_cast<QSerialPort*>(link.get());
     emit error(tr("Reception timeout on %1").arg(serial->portName()));
 }
 
@@ -322,7 +345,7 @@ void Link::handleSerialPortError(QSerialPort::SerialPortError err)
 {
     if (err == 0) return;
 
-    QSerialPort *serial = static_cast<QSerialPort*>(link);
+    QSerialPort *serial = dynamic_cast<QSerialPort*>(link.get());
 
     qDebug() << serial->error() << " " << serial->errorString();
     switch (err)
@@ -351,7 +374,7 @@ void Link::handleSerialPortError(QSerialPort::SerialPortError err)
 
 void Link::handleSocketError(QAbstractSocket::SocketError err)
 {
-    QTcpSocket *socket = static_cast<QTcpSocket*>(link);
+    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(link.get());
 
     qDebug() << socket->error() << " " << socket->errorString();
     //switch (err)

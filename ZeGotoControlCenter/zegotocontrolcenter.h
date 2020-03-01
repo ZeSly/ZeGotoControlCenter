@@ -1,6 +1,8 @@
 #ifndef ZEGOTOCONTROLCENTER_H
 #define ZEGOTOCONTROLCENTER_H
 
+#include <memory>
+
 #include <QtWidgets/QMainWindow>
 #include <QSettings>
 #include <QTimer>
@@ -118,10 +120,12 @@ private:
 	Ui::ZeGotoControlCenterClass ui;
 	QSettings settings;
 	QSystemTrayIcon systrayIcon;
-	Link *link;
 	QTimer TelescopePositionTimer;
 	QTimer PierFlipAlertTimer;
 	QSemaphore unique;
+
+    std::unique_ptr<Link> link;
+    bool TryReconnect;
 
 	void DisplayCoord(const char *s, QLabel *label, bool deg, int geo = 0, double *value = NULL);
 

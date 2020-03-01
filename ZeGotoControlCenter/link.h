@@ -1,6 +1,8 @@
 #ifndef LINK_H
 #define LINK_H
 
+#include <memory>
+
 #include <QtSerialPort/QSerialPort>
 #include <QTcpSocket>
 #include <QTimer>
@@ -19,11 +21,16 @@ class Link : public QObject
     Q_OBJECT
 
 public:
-    Link(QString portName, QObject *parent = 0);
-    Link(QString Address, qint16 Port, QObject *parent = 0);
-    ~Link(void);
+    Link(QObject *parent = 0);
+    ~Link();
+
+    void Open(QString portName);
+    void Open(QString Address, qint16 Port);
 
     void Connect();
+    void Disconnect();
+
+    bool IsConnected();
 
     void Command(const char *command);
 	void CommandGPS(const char *command);
@@ -67,7 +74,7 @@ private:
     char resp[128];
     QTimer timer;
 
-    QIODevice *link;
+    std::shared_ptr<QIODevice> link;
     QString AddressIP;
     qint16 PortIP;
 
