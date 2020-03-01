@@ -49,7 +49,7 @@ Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Fl
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Telescope.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; Firmware
-Source: "D:\Users\ZeSly\MPLABXProjects\ZeGoto.X\release\*.hex"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\ZeSly\MPLABXProjects\ZeGoto.X\release\*.hex"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -72,15 +72,9 @@ Filename: "{app}\ASCOM.ZeGoto.Server.exe"; Parameters: "/unregister"
 function InitializeSetup(): Boolean;
 var
    U : Variant;
-   H : Variant;
 begin
    Result := FALSE;  // Assume failure
    // check that the DriverHelper and Utilities objects exist, report errors if they don't
-   try
-      H := CreateOLEObject('DriverHelper.Util');
-   except
-      MsgBox('The ASCOM DriverHelper object has failed to load, this indicates a serious problem with the ASCOM installation', mbInformation, MB_OK);
-   end;
    try
       U := CreateOLEObject('ASCOM.Utilities.Util');
    except
