@@ -99,7 +99,7 @@ FirmwareUpdate::FirmwareUpdate(QString file, QWidget *parent) :
         emit SetProgressBar(0);
     }
 
-    timer->start(1000); //Check for future USB connection status changes every 1000 milliseconds.
+    timer->start(250); //Check for future USB connection status changes every 250 milliseconds.
 }
 
 FirmwareUpdate::~FirmwareUpdate()
