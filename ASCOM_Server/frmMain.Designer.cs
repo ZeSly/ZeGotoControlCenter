@@ -30,6 +30,7 @@ namespace ASCOM.ZeGoto
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.label_nb_clients = new System.Windows.Forms.Label();
             this.label_connect = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -59,6 +60,7 @@ namespace ASCOM.ZeGoto
             this.Controls.Add(this.label_connect);
             this.Controls.Add(this.label_nb_clients);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMain";
             this.Text = "ZeGoto Driver Server";
             this.ResumeLayout(false);

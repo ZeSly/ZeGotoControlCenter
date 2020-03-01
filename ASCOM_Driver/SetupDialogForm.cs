@@ -24,9 +24,9 @@ namespace ASCOM.ZeGoto
 
             string[] s_Ports = System.IO.Ports.SerialPort.GetPortNames();
 
-            comboSerialPort.Items.AddRange(s_Ports);
-            comboSerialPort.Items.Add("TCP/IP");
             comboSerialPort.Items.Add("Through OGCC");
+            comboSerialPort.Items.Add("TCP/IP");
+            comboSerialPort.Items.AddRange(s_Ports);
 
             if (Telescope.comPort != "")
             {
