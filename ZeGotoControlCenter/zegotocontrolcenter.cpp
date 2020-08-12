@@ -372,7 +372,11 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 		ui.pushButton_Connect->setText(tr("Connect"));
 		ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
 		ui.pushButton_Connect->setChecked(false);
-	}
+
+        disconnect(link.get(), SIGNAL(connected()), this, SLOT(linkConnected()));
+        disconnect(link.get(), SIGNAL(error(QString)), this, SLOT(showError(QString)));
+        disconnect(link.get(), SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
+    }
 	else
 	{
 		QString portName = ui.comboBox_ConnectionType->currentData().toString();

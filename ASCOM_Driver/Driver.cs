@@ -168,7 +168,7 @@ namespace ASCOM.ZeGoto
             //            string d = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\ASCOM.ZeGoto.log";
             //            tl = new TraceLogger(d, "ZeGoto");
             //#else
-            tl = new TraceLogger("", "ZeGoto");
+            tl = new TraceLogger("ZeGoto");
             //#endif
             tl.Enabled = traceState;
             tl.LogMessage("Telescope", "Starting initialisation");
