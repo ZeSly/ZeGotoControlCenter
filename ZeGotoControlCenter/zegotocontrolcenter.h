@@ -29,9 +29,10 @@ public:
 	explicit ZeGotoControlCenter(QWidget *parent = 0);
 	~ZeGotoControlCenter();
 
-	private slots:
-	void linkConnected();
-	void showError(QString msg);
+private slots:
+    void linkConnected();
+    void linkDisconnected();
+    void showError(QString msg);
 	void linkResponse(const char *command, const char *response);
 
 	void on_TelescopePositionTime();

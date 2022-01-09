@@ -42,6 +42,7 @@ public:
 
 Q_SIGNALS:
     void connected();
+    void disconnected();
     void error(QString msg);
     void response(const char *command, const char *resp);
 	void nothing_to_send();
@@ -55,6 +56,8 @@ private slots:
     void handleSocketError(QAbstractSocket::SocketError err);
 
 private:
+    static const int timeout;
+
     struct T_TypeCommand
     {
         QString Command;
@@ -79,6 +82,8 @@ private:
     qint16 PortIP;
 
     void Send(T_LastCommand *command);
+
+    QMetaObject::Connection m_ErrorConnection;
 };
 
 #endif // SERIALLINK_H

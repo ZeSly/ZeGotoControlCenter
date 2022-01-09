@@ -40,10 +40,9 @@ void ZeGotoControlCenter::ASCOMConnect()
         ASCOMConnection = ASCOMServer->nextPendingConnection();
         connect(ASCOMConnection, SIGNAL(disconnected()), this, SLOT(ASCOMDisconnect()));
         connect(ASCOMConnection, SIGNAL(readyRead()), this, SLOT(ASCOMReadCommand()));
-        //connect(ASCOMConnection, SIGNAL(error(QAbstractSocket::SocketError)),
         ASCOMConnected = true;
 
-        ui.statusBar->showMessage(tr("ASCOM driver connected."));
+        ui.statusBar->showMessage(tr("ASCOM driver connected."), 2000);
     }
 }
 
@@ -51,7 +50,7 @@ void ZeGotoControlCenter::ASCOMDisconnect()
 {
     ASCOMConnected = false;
     ASCOMConnection->deleteLater();
-    ui.statusBar->showMessage(tr("ASCOM driver disconnected."));
+    ui.statusBar->showMessage(tr("ASCOM driver disconnected."), 2000);
 }
 
 void ZeGotoControlCenter::ASCOMReadCommand()

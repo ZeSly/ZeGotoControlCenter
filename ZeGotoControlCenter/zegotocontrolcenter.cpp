@@ -364,18 +364,7 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 
 	if (link->IsConnected())
 	{
-		TelescopePositionTimer.stop();
-		link->Disconnect();
-
-		setConnectedWidgetEnabled(false);
-
-		ui.pushButton_Connect->setText(tr("Connect"));
-		ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
-		ui.pushButton_Connect->setChecked(false);
-
-        disconnect(link.get(), SIGNAL(connected()), this, SLOT(linkConnected()));
-        disconnect(link.get(), SIGNAL(error(QString)), this, SLOT(showError(QString)));
-        disconnect(link.get(), SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
+        linkDisconnected();
     }
 	else
 	{
@@ -392,6 +381,7 @@ void ZeGotoControlCenter::on_pushButton_Connect_clicked()
 		}
 
 		connect(link.get(), SIGNAL(connected()), this, SLOT(linkConnected()));
+        connect(link.get(), SIGNAL(disconnected()), this, SLOT(linkDisconnected()));
 		connect(link.get(), SIGNAL(error(QString)), this, SLOT(showError(QString)));
 		connect(link.get(), SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
 
@@ -404,7 +394,7 @@ void ZeGotoControlCenter::linkConnected()
 	Synched = false;
     if (TryReconnect)
     {
-        ui.statusBar->showMessage(tr("Reconnected"));
+        ui.statusBar->showMessage(tr("Reconnected"), 1000);
         TryReconnect = false;
     }
 
@@ -448,23 +438,31 @@ void ZeGotoControlCenter::linkConnected()
 	TelescopePositionTimer.start();
 }
 
+void ZeGotoControlCenter::linkDisconnected()
+{
+    TelescopePositionTimer.stop();
+    link->Disconnect();
+
+    setConnectedWidgetEnabled(false);
+
+    ui.pushButton_Connect->setText(tr("Connect"));
+    ui.pushButton_Connect->setIcon(QIcon(":/Images/Resources/network-disconnect.png"));
+    ui.pushButton_Connect->setChecked(false);
+
+    disconnect(link.get(), SIGNAL(connected()), this, SLOT(linkConnected()));
+    disconnect(link.get(), SIGNAL(disconnected()), this, SLOT(linkDisconnected()));
+    disconnect(link.get(), SIGNAL(error(QString)), this, SLOT(showError(QString)));
+    disconnect(link.get(), SIGNAL(response(const char *, const char *)), this, SLOT(linkResponse(const char *, const char *)));
+}
+
 void ZeGotoControlCenter::showError(QString msg)
 {
 	TelescopePositionTimer.stop();
     link->Disconnect();
-    //if (!TryReconnect)
-    {
-        //QMessageBox *msgBox = new QMessageBox(this);
-        //msgBox->setIcon(QMessageBox::Warning);
-        //msgBox->setWindowTitle(tr("Communication error"));
-        //msgBox->setText(msg);
-        //msgBox->setAttribute(Qt::WA_DeleteOnClose); // delete pointer after close
-        //msgBox->setModal(false);
-        //msgBox->show();
 
-        ui.statusBar->showMessage(msg);
-    }
+    ui.statusBar->showMessage(msg);
     qDebug() << __FUNCTION__ << ": " << msg;
+
     TryReconnect = true;
     link->Connect();
 }
