@@ -967,7 +967,7 @@ namespace ASCOM.ZeGoto
                 if (useGPS == true)
                 {
                     CheckConnected("The scope is not connected.");
-                    longitude = utilities.DMSToDegrees(CommandString("Gg", false));
+                    longitude = -utilities.DMSToDegrees(CommandString("Gg", false));
                     using (Profile driverProfile = new Profile())
                     {
                         driverProfile.DeviceType = "Telescope";
