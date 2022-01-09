@@ -79,10 +79,10 @@ namespace ASCOM.ZeGoto
                     }
                     else
                     {
+                        m_Connected = value;
                         socket.Shutdown(SocketShutdown.Both);
                         socket.Disconnect(false);
                         socket = null;
-                        m_Connected = value;
                     }
                 }
                 else

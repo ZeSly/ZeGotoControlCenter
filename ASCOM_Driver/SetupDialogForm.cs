@@ -24,23 +24,6 @@ namespace ASCOM.ZeGoto
 
             string[] s_Ports = System.IO.Ports.SerialPort.GetPortNames();
 
-            comboSerialPort.Items.Add("Through OGCC");
-            comboSerialPort.Items.Add("TCP/IP");
-            comboSerialPort.Items.AddRange(s_Ports);
-
-            if (Telescope.comPort != "")
-            {
-                int i_Port = 0;
-                foreach (string p in comboSerialPort.Items)
-                {
-                    if (p == Telescope.comPort) break;
-                    i_Port++;
-                }
-                if (i_Port == comboSerialPort.Items.Count) i_Port = comboSerialPort.Items.Add(Telescope.comPort);
-                comboSerialPort.SelectedItem = Telescope.comPort;
-            }
-            textBoxIPAddress.Text = Telescope.ipAddress;
-            textBoxIPPort.Text = Telescope.ipPort.ToString();
 
             textBoxAperture.Text = Telescope.apertureDiameter.ToString();
             if (textBoxAperture.Text == "") textBoxAperture.Text = "0";
@@ -68,9 +51,6 @@ namespace ASCOM.ZeGoto
 
             textBoxElevation.Text = Telescope.elevation.ToString("###0");
 
-            textBoxMaxRate.Text = Telescope.maxRate.ToString();
-            comboBoxParkPosition.SelectedIndex = Telescope.parkPosition;
-
             labelVersion.Text = "v" + Application.ProductVersion;
             chkTrace.Checked = Telescope.traceState;
         }
@@ -79,15 +59,11 @@ namespace ASCOM.ZeGoto
         {
             // Place any validation constraint checks here
 
-            Telescope.comPort = comboSerialPort.GetItemText(comboSerialPort.SelectedItem);
-            Telescope.ipAddress = textBoxIPAddress.Text;
-            int.TryParse(textBoxIPPort.Text, out Telescope.ipPort);
             double.TryParse(textBoxAperture.Text, out Telescope.apertureDiameter);
             Telescope.apertureArea = 3.1415926535897932384626433832795 * Math.Pow(Telescope.apertureDiameter / 2, 2);
             double.TryParse(textBoxFocalLength.Text, out Telescope.focalLength);
             Telescope.useGPS = checkBoxUseGPS.Checked;
             Telescope.traceState = chkTrace.Checked;
-            Telescope.parkPosition = comboBoxParkPosition.SelectedIndex;
 
             if (!checkBoxUseGPS.Checked)
             {
@@ -214,20 +190,6 @@ namespace ASCOM.ZeGoto
             textBoxLatitude.Enabled = !checkBoxUseGPS.Checked;
             textBoxLongitude.Enabled = !checkBoxUseGPS.Checked;
             textBoxElevation.Enabled = !checkBoxUseGPS.Checked;
-        }
-
-        private void comboSerialPort_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if ((string)comboSerialPort.SelectedItem == "TCP/IP")
-            {
-                textBoxIPAddress.Enabled = true;
-                textBoxIPPort.Enabled = true;
-            }
-            else
-            {
-                textBoxIPAddress.Enabled = false;
-                textBoxIPPort.Enabled = false;
-            }
         }
     }
 }

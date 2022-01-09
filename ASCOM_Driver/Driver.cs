@@ -81,35 +81,28 @@ namespace ASCOM.ZeGoto
         /// </summary>
         private static string driverDescription = "ZeGoto";
 
-        internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
-        internal static string comPortDefault = "COM1";
         internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "false";
+        internal static string traceStateDefault = "true";
 
         // Variables to hold the currrent device configuration
-        internal static string comPort;
-        internal static string ipAddress;
-        internal static int ipPort;
-
         internal static double apertureArea;
         internal static double apertureDiameter;
         internal static double focalLength;
-        
+
         internal static bool useGPS;
         internal static double latitude;
         internal static double longitude;
         internal static double elevation;
 
-        internal static UInt32 maxRate;
-        internal static int parkPosition;        
-        
+        internal static double maxRate;
+
         internal static bool traceState;
 
         /// <summary>
         /// Private variable to hold an ASCOM Utilities object
         /// </summary>
         private Util utilities;
-        
+
         /// <summary>
         /// Private variable to hold the trace logger object (creates a diagnostic log file with information that you specify)
         /// </summary>
@@ -185,7 +178,7 @@ namespace ASCOM.ZeGoto
         // PUBLIC COM INTERFACE ITelescopeV3 IMPLEMENTATION
         //
 
-#region Common properties and methods.
+        #region Common properties and methods.
 
         /// <summary>
         /// Displays the Setup Dialog form.
@@ -230,63 +223,93 @@ namespace ASCOM.ZeGoto
 
         public void CommandBlind(string command, bool raw)
         {
-            CheckConnected("CommandBlind");
-            SharedResources.SharedLink.ClearBuffers();                    // Clear remaining junk in buffer
-            if (!raw)
-                SharedResources.SharedLink.Transmit(":" + command + "#");
-            else
-                SharedResources.SharedLink.Transmit(command);
+            try
+            {
+                CheckConnected("CommandBlind");
+                SharedResources.SharedLink.ClearBuffers();                    // Clear remaining junk in buffer
+                if (!raw)
+                    SharedResources.SharedLink.Transmit(":" + command + "#");
+                else
+                    SharedResources.SharedLink.Transmit(command);
+            }
+            catch (Exception e)
+            {
+                SharedResources.SharedLink.ClearBuffers();
+                SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandBlind", command + " Exception.Message: " + e.Message);
+                throw e;
+            }
         }
 
         public bool CommandBool(string command, bool raw)
         {
             string ret;
 
-            lock (lockObject)
+            try
             {
-                CheckConnected("CommandBool");
-                SharedResources.SharedLink.ClearBuffers();    // Clear remaining junk in buffer
-                if (!raw)
-                    SharedResources.SharedLink.Transmit(":" + command + "#");
-                else
-                    SharedResources.SharedLink.Transmit(command);
-                ret = SharedResources.SharedLink.ReceiveCounted(1);   // Just a 1 or 0
+                lock (lockObject)
+                {
+                    CheckConnected("CommandBool");
+                    SharedResources.SharedLink.ClearBuffers();    // Clear remaining junk in buffer
+                    if (!raw)
+                        SharedResources.SharedLink.Transmit(":" + command + "#");
+                    else
+                        SharedResources.SharedLink.Transmit(command);
+                    ret = SharedResources.SharedLink.ReceiveCounted(1);   // Just a 1 or 0
 
-                return (ret == "1");
+                    return (ret == "1");
+                }
+            }
+            catch (Exception e)
+            {
+                SharedResources.SharedLink.ClearBuffers();
+                SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandBool", command + " Exception.Message: " + e.Message);
+                throw e;
             }
         }
 
         public string CommandString(string command, bool raw)
         {
-            lock (lockObject)
+            try
             {
-
-                CheckConnected("CommandString");
-                // it's a good idea to put all the low level communication with the device here,
-                // then all communication calls this function
-                // you need something to ensure that only one command is in progress at a time
-
-                string buf;
-                string ret = "";
-
-                SharedResources.SharedLink.ClearBuffers();
-                if (!raw)
+                lock (lockObject)
                 {
-                    SharedResources.SharedLink.Transmit(":" + command + "#");
-                    buf = SharedResources.SharedLink.ReceiveTerminated("#");
-                    if (buf != "")  // Overflow protection
+
+                    CheckConnected("CommandString");
+                    // it's a good idea to put all the low level communication with the device here,
+                    // then all communication calls this function
+                    // you need something to ensure that only one command is in progress at a time
+
+                    string buf;
+                    string ret = "";
+
+                    SharedResources.SharedLink.ClearBuffers();
+                    if (!raw)
                     {
-                        ret = buf.Substring(0, buf.Length - 1); // Strip '#'
+                        SharedResources.SharedLink.Transmit(":" + command + "#");
+                        buf = SharedResources.SharedLink.ReceiveTerminated("#");
+                        if (buf != "")  // Overflow protection
+                        {
+                            ret = buf.Substring(0, buf.Length - 1); // Strip '#'
+                        }
                     }
-                }
-                else
-                {
-                    SharedResources.SharedLink.Transmit(command);
-                    buf = SharedResources.SharedLink.Receive();
-                    ret = buf;
-                }
+                    else
+                    {
+                        SharedResources.SharedLink.Transmit(command);
+                        buf = SharedResources.SharedLink.Receive();
+                        ret = buf;
+                    }
 
-                return ret;
+                    return ret;
+                }
+            }
+            catch (Exception e)
+            {
+                SharedResources.SharedLink.ClearBuffers();
+                SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandString", command + " Exception.Message: " + e.Message);
+                throw e;
             }
         }
 
@@ -316,12 +339,9 @@ namespace ASCOM.ZeGoto
                 tl.LogMessage("Connected Set", value.ToString());
                 if (value == IsConnected)
                 {
-                    tl.LogMessage("Already connected", "");
-                    tl.LogMessage("LongFormat = ", SharedResources.LongFormat.ToString());
-                    return;
+                    tl.LogMessage(value ? "Already connected" : "Already disconnected", "");
                 }
-
-                if (value)
+                else if (value)
                 {
                     string sRA, sDec;
                     Regex rx;
@@ -332,62 +352,29 @@ namespace ASCOM.ZeGoto
                     // 1) Set up the communications SharedResources.SharedLink.
                     if (!SharedResources.Connected)
                     {
-                        tl.LogMessage("Connected Set", "Connecting... " + comPort);
-                        if (comPort == "TCP/IP")
-                        {
-                            SharedResources.SharedLink.IPAddress = ipAddress;
-                            if (ipPort != 0)
-                            {
-                                SharedResources.SharedLink.Port = ipPort;
-                            }
-                            else
-                            {
-                                SharedResources.SharedLink.Port = 4030;
-                            }
-                            SharedResources.SharedLink.TcpIp = true;
-                        }
-                        else if (comPort == "Through OGCC")
-                        {
-                            string d = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-#if DEBUG
-                            string ZeGotoControlCenterPath = d + @"\..\..\..\Win32\Release\ZeGotoControlCenter.exe";
-#else
-                            string ZeGotoControlCenterPath = d + @"\ZeGotoControlCenter.exe";
-#endif
-                            try
-                            {
-                                ProcessStartInfo startInfo = new ProcessStartInfo(ZeGotoControlCenterPath);
-                                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                                startInfo.Arguments = "-minimized";
-                                ZeGotoControlCenterProcess = Process.Start(startInfo);
-                            }
-                            catch (Exception e)
-                            {
-                                SharedResources.Connected = false;
-                                tl.LogMessage("Connected Set", d);
-                                tl.LogMessage("Connected Set", ZeGotoControlCenterPath + " : " + e.Message);
-                                Exception myexp = new Exception(ZeGotoControlCenterPath + " : " + e.Message);
-                                throw myexp;
-                            }
+                        tl.LogMessage("Connected Set", "Connecting... ");
+                        string d = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        string ZeGotoControlCenterPath = d + @"\ZeGotoControlCenter.exe";
 
-                            SharedResources.SharedLink.IPAddress = "127.0.0.1";
-                            SharedResources.SharedLink.Port = 5085;
-                            SharedResources.SharedLink.TcpIp = true;
-                        }
-                        else
+                        try
                         {
-                            int p;
-                            if (int.TryParse(comPort.Substring(3), out p))
-                            {
-                                SharedResources.SharedLink.Port = p;
-                            }
-                            else
-                            {
-                                SharedResources.SharedLink.PortName = comPort;
-                            }
-                            SharedResources.SharedLink.Speed = Utilities.SerialSpeed.ps9600;
-                            SharedResources.SharedLink.TcpIp = false;
+                            ProcessStartInfo startInfo = new ProcessStartInfo(ZeGotoControlCenterPath);
+                            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                            startInfo.Arguments = "-minimized";
+                            ZeGotoControlCenterProcess = Process.Start(startInfo);
                         }
+                        catch (Exception e)
+                        {
+                            SharedResources.Connected = false;
+                            tl.LogMessage("Connected Set", d);
+                            tl.LogMessage("Connected Set", ZeGotoControlCenterPath + " : " + e.Message);
+                            Exception myexp = new Exception(ZeGotoControlCenterPath + " : " + e.Message);
+                            throw myexp;
+                        }
+
+                        SharedResources.SharedLink.IPAddress = "127.0.0.1";
+                        SharedResources.SharedLink.Port = 5085;
+                        SharedResources.SharedLink.TcpIp = true;
                         SharedResources.SharedLink.ReceiveTimeout = 5;
                         SharedResources.Connected = true;
                     }
@@ -401,20 +388,24 @@ namespace ASCOM.ZeGoto
                         tl.LogMessage("Connected Set", "GR transmited, sending GD...");
                         m_dPrevRA = utilities.HMSToHours(sRA);
                         sDec = this.CommandString("GD", false);
-                        tl.LogMessage("Connected Set", "GD transmited");
+                        tl.LogMessage("Connected Set", "GD transmited, sending rM");
                         m_dPrevDec = utilities.DMSToDegrees(sDec);
+                        string sMaxRate = CommandString("rM", false);
+                        tl.LogMessage("Connected Set", "rM transmited, Max rate=" + sMaxRate);
+                        maxRate = Convert.ToDouble(sMaxRate);
                     }
                     catch (Exception e)
                     {
                         SharedResources.SharedLink.ClearBuffers();
                         SharedResources.Connected = false;  // Release the port
-                        throw new NotConnectedException(e.Message + "\r\nNo response to LX200 command. There doesn't appear to be anything connected to the COM port.");
+                        tl.LogMessage("Connected Set", "Error: No response from ZeGotoControlCenter !");
+                        throw new NotConnectedException(e.Message + "\r\nNo response from ZeGotoControlCenter !");
                     }
                     SharedResources.SharedLink.ClearBuffers();        // Toss any junk remaining in buffers
 
                     // 3) Final timeout & try for long format.
                     SharedResources.SharedLink.ReceiveTimeout = 10;   // Switch to 10 sec timeout
-                    SharedResources.LongFormat = true;   // SetLongFormat(true);                // Try for long format
+                    SharedResources.LongFormat = true;
                     //
                     // (4) Initialize slew detection parameters. The registry values may be
                     //     missing if the SetupDialog() had not yet been used. We default
@@ -440,14 +431,14 @@ namespace ASCOM.ZeGoto
                     {
                         SharedResources.RADelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
                         SharedResources.RADelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
-                        tl.LogMessage("SharedResources.RADelimMin = ", SharedResources.RADelimMin.ToString());
-                        tl.LogMessage("SharedResources.RADelimSec = ", SharedResources.RADelimSec.ToString());
+                        tl.LogMessage("shared.RADelimMin", SharedResources.RADelimMin.ToString());
+                        tl.LogMessage("shared.RADelimSec", SharedResources.RADelimSec.ToString());
                     }
                     else
                     {
                         SharedResources.RADelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
                         SharedResources.RADelimSec = "";
-                        tl.LogMessage("SharedResources.RADelimMin = ", SharedResources.RADelimMin.ToString());
+                        tl.LogMessage("shared.RADelimMin", SharedResources.RADelimMin.ToString());
                     }
                     mt = rx.Matches(sDec);
                     SharedResources.DecDelimDeg = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
@@ -455,29 +446,26 @@ namespace ASCOM.ZeGoto
                     {
                         SharedResources.DecDelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
                         SharedResources.DecDelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
-                        tl.LogMessage("SharedResources.DecDelimMin = ", SharedResources.DecDelimMin.ToString());
-                        tl.LogMessage("SharedResources.DecDelimSec = ", SharedResources.DecDelimSec.ToString());
+                        tl.LogMessage("shared.DecDelimMin", SharedResources.DecDelimMin.ToString());
+                        tl.LogMessage("shared.DecDelimSec", SharedResources.DecDelimSec.ToString());
                     }
                     else
                     {
                         SharedResources.DecDelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
                         SharedResources.DecDelimSec = "";
-                        tl.LogMessage("SharedResources.DecDelimMin = ", SharedResources.DecDelimMin.ToString());
-                    } 
-                    
-                    tl.LogMessage("Connected Set", "Connected to port " + comPort);
+                        tl.LogMessage("shared.DecDelimMin", SharedResources.DecDelimMin.ToString());
+                    }
+
+                    tl.LogMessage("Connected Set", "Connected.");
                 }
                 else
                 {
                     tl.LogMessage("Connected Set", "Disconnecting...");
 
-                    if (SharedResources.Connected) this.CommandBlind("Q", false);    // Stop all motion
-                    SharedResources.Slewing = false; // No longer slewing
-                    if (SharedResources.Connected) SetLongFormat(false);
                     SharedResources.SharedLink.ClearBuffers();    // Clear serial buffers
                     SharedResources.Connected = false;
-                    
-                    tl.LogMessage("Connected Set", "Disconnected from port " + comPort);
+
+                    tl.LogMessage("Connected Set", "Disconnected.");
                 }
             }
         }
@@ -516,7 +504,7 @@ namespace ASCOM.ZeGoto
                 if (IsConnected)
                 {
                     sDriverInfo += "\r\nFirmware version: " + CommandString("GVN", false);
-                    sDriverInfo += "\r\nFirmware date: " + CommandString("GVD", false) + " " + CommandString("GVT",false);
+                    sDriverInfo += "\r\nFirmware date: " + CommandString("GVD", false) + " " + CommandString("GVT", false);
                 }
 
                 tl.LogMessage("DriverInfo Get", sDriverInfo);
@@ -555,9 +543,9 @@ namespace ASCOM.ZeGoto
             }
         }
 
-#endregion
+        #endregion
 
-#region ITelescope Implementation
+        #region ITelescope Implementation
         public void AbortSlew()
         {
             tl.LogMessage("AbortSlew", "");
@@ -703,7 +691,7 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                EquatorialCoordinateType equatorialSystem = EquatorialCoordinateType.equLocalTopocentric;
+                EquatorialCoordinateType equatorialSystem = EquatorialCoordinateType.equTopocentric;
                 tl.LogMessage("DeclinationRate", "Get - " + equatorialSystem.ToString());
                 return equatorialSystem;
             }
@@ -771,7 +759,7 @@ namespace ASCOM.ZeGoto
 
             switch (Axis)
             {
-                case TelescopeAxes.axisPrimary :
+                case TelescopeAxes.axisPrimary:
                     if (Rate >= 0)
                     {
                         // Move east
@@ -783,7 +771,7 @@ namespace ASCOM.ZeGoto
                         CommandBlind("Mw", false);
                     }
                     break;
-                case TelescopeAxes.axisSecondary :
+                case TelescopeAxes.axisSecondary:
                     if (Rate >= 0)
                     {
                         // Move north
@@ -857,16 +845,8 @@ namespace ASCOM.ZeGoto
 
         public void SetPark()
         {
-            if (parkPosition == 0)
-            {
-                CommandBlind("hS", false);
-                tl.LogMessage("SetPark", "Park position: current mount position");
-            }
-            else
-            {
-                CommandBlind("hS" + parkPosition.ToString(), false);
-                tl.LogMessage("SetPark", "Park position: " + parkPosition.ToString());
-            }
+            CommandBlind("hP", false);
+            tl.LogMessage("SetPark", "Park mount..");
         }
 
         public PierSide SideOfPier
@@ -1117,7 +1097,7 @@ namespace ASCOM.ZeGoto
                     try
                     {
                         utilities.WaitForMilliseconds(200);
-                        resp  = this.CommandString("MS", false);                        
+                        resp = this.CommandString("MS", false);
                         if (resp[0] != '0')  // Failed to start slew
                         {
                             SharedResources.Slewing = false; // Clear slewing flag
@@ -1416,13 +1396,13 @@ namespace ASCOM.ZeGoto
             SharedResources.isParked = false;
         }
 
-#endregion
+        #endregion
 
-#region Private properties and methods
+        #region Private properties and methods
         // here are some useful properties and methods that can be used as required
         // to help with driver development
 
-#region ASCOM Registration
+        #region ASCOM Registration
 
         //// Register or unregister driver for ASCOM. This is harmless if already
         //// registered or unregistered. 
@@ -1494,7 +1474,7 @@ namespace ASCOM.ZeGoto
         //    RegUnregASCOM(false);
         //}
 
-#endregion
+        #endregion
 
         /// <summary>
         /// Returns true if there is a valid connection to the driver hardware
@@ -1528,9 +1508,6 @@ namespace ASCOM.ZeGoto
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Telescope";
-                comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
-                ipAddress = driverProfile.GetValue(driverID, "IPAddress", string.Empty, string.Empty);
-                ipPort = Convert.ToInt32(driverProfile.GetValue(driverID, "IPPort", string.Empty, "4030"));
 
                 apertureDiameter = Convert.ToDouble(driverProfile.GetValue(driverID, "ApertureDiameter", string.Empty, "0"));
                 focalLength = Convert.ToDouble(driverProfile.GetValue(driverID, "FocalLength", string.Empty, "0"));
@@ -1540,9 +1517,6 @@ namespace ASCOM.ZeGoto
                 latitude = Convert.ToDouble(driverProfile.GetValue(driverID, "Latitude", string.Empty, "0"));
                 longitude = Convert.ToDouble(driverProfile.GetValue(driverID, "Longitude", string.Empty, "0"));
                 elevation = Convert.ToDouble(driverProfile.GetValue(driverID, "Elevation", string.Empty, "0"));
-
-                maxRate = Convert.ToUInt32(driverProfile.GetValue(driverID, "MaxRate", string.Empty, "120"));
-                parkPosition = Convert.ToInt32(driverProfile.GetValue(driverID, "ParkPosition", string.Empty, "3"));
 
                 traceState = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
             }
@@ -1556,9 +1530,6 @@ namespace ASCOM.ZeGoto
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Telescope";
-                driverProfile.WriteValue(driverID, comPortProfileName, comPort);
-                driverProfile.WriteValue(driverID, "IPAddress", ipAddress);
-                driverProfile.WriteValue(driverID, "IPPort", ipPort.ToString());
 
                 driverProfile.WriteValue(driverID, "ApertureDiameter", apertureDiameter.ToString());
                 driverProfile.WriteValue(driverID, "FocalLength", focalLength.ToString());
@@ -1568,29 +1539,21 @@ namespace ASCOM.ZeGoto
                 driverProfile.WriteValue(driverID, "Longitude", longitude.ToString());
                 driverProfile.WriteValue(driverID, "Elevation", elevation.ToString());
 
-                driverProfile.WriteValue(driverID, "MaxRate", maxRate.ToString());
-                driverProfile.WriteValue(driverID, "ParkPosition", parkPosition.ToString());
-
                 driverProfile.WriteValue(driverID, traceStateProfileName, traceState.ToString());
             }
 
             Configuration driverConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             driverConfig.AppSettings.Settings.Clear();
-            driverConfig.AppSettings.Settings.Add("IPAddress", ipAddress);
-            driverConfig.AppSettings.Settings.Add("IPPort",ipPort.ToString());
 
-            driverConfig.AppSettings.Settings.Add("ApertureDiameter",apertureDiameter.ToString());
-            driverConfig.AppSettings.Settings.Add("FocalLength",focalLength.ToString());
+            driverConfig.AppSettings.Settings.Add("ApertureDiameter", apertureDiameter.ToString());
+            driverConfig.AppSettings.Settings.Add("FocalLength", focalLength.ToString());
 
-            driverConfig.AppSettings.Settings.Add("UseGPS",useGPS.ToString());
-            driverConfig.AppSettings.Settings.Add("Latitude",latitude.ToString());
-            driverConfig.AppSettings.Settings.Add("Longitude",longitude.ToString());
-            driverConfig.AppSettings.Settings.Add("Elevation",elevation.ToString());
+            driverConfig.AppSettings.Settings.Add("UseGPS", useGPS.ToString());
+            driverConfig.AppSettings.Settings.Add("Latitude", latitude.ToString());
+            driverConfig.AppSettings.Settings.Add("Longitude", longitude.ToString());
+            driverConfig.AppSettings.Settings.Add("Elevation", elevation.ToString());
 
-            driverConfig.AppSettings.Settings.Add("MaxRate",maxRate.ToString());
-            driverConfig.AppSettings.Settings.Add("ParkPosition",parkPosition.ToString());
-
-            driverConfig.AppSettings.Settings.Add(traceStateProfileName,traceState.ToString());
+            driverConfig.AppSettings.Settings.Add(traceStateProfileName, traceState.ToString());
             driverConfig.Save();
         }
 
@@ -1666,7 +1629,7 @@ namespace ASCOM.ZeGoto
             return d;
         }
 
-#endregion
+        #endregion
 
     }
 }

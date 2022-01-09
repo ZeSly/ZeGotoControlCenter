@@ -84,8 +84,8 @@ namespace ASCOM.ZeGoto
         {
             this.axis = axis;
 
-            double minimum = 360.0 / 86400.0 * 2;
-            double maximum = 360.0 / 86400.0 * (double)Telescope.maxRate;
+            double minimum = 360.0 / 86400.0 * 1;
+            double maximum = 360.0 / 86400.0 * Telescope.maxRate;
 
             //
             // This collection must hold zero or more Rate objects describing the 

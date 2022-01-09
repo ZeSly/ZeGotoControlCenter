@@ -36,7 +36,7 @@ namespace ASCOM.ZeGoto
 
         // Shared serial port. This will allow multiple drivers to use one single serial port.
         private static SerialOrSocket s_sharedLink = new SerialOrSocket();		// Shared serial port
-        private static int s_z = 0;     // counter for the number of connections to the serial port
+        private static int s_nbConnections = 0;     // counter for the number of connections to the serial port
 
         public static ConnectDelegate OnConnect;
 
@@ -67,7 +67,7 @@ namespace ASCOM.ZeGoto
         /// <summary>
         /// number of connections to the shared serial port
         /// </summary>
-        public static int connections { get { return s_z; } set { s_z = value; } }
+        public static int connections { get { return s_nbConnections; } set { s_nbConnections = value; } }
 
         /// <summary>
         /// Example of a shared SendMessage method, the lock
@@ -103,25 +103,23 @@ namespace ASCOM.ZeGoto
                 {
                     if (value)
                     {
-                        if (s_z == 0)
+                        if (s_nbConnections == 0)
                         {
                             SharedLink.Connected = true;
                         }
-                        s_z++;
-                        if (OnConnect != null) OnConnect(true, s_z);
+                        s_nbConnections++;
+                        if (OnConnect != null) OnConnect(true, s_nbConnections);
                     }
                     else
                     {
-                        if (Server.ObjectsCount <= 0)
-                        {
-                            s_z--;
+                        s_nbConnections--;
 
-                            if (s_z <= 0)
-                            {
-                                SharedLink.Connected = false;
-                            }
-                            if (OnConnect != null) OnConnect(false, s_z);
+                        if (s_nbConnections <= 0)
+                        {
+                            s_nbConnections = 0;
+                            SharedLink.Connected = false;
                         }
+                        if (OnConnect != null) OnConnect(false, s_nbConnections);
                     }
                 }
             }

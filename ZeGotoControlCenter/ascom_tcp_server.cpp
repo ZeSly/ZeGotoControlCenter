@@ -31,7 +31,7 @@ void ZeGotoControlCenter::ASCOMConnect()
 {
     if (!ASCOMConnected)
     {
-        if (link == NULL)
+        if (!link->IsConnected())
         {
             ui.statusBar->showMessage(tr("ASCOM driver connecting..."));
             on_pushButton_Connect_clicked();

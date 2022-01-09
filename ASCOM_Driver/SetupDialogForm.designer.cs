@@ -31,12 +31,6 @@ namespace ASCOM.ZeGoto
             this.cmdOK = new System.Windows.Forms.Button();
             this.cmdCancel = new System.Windows.Forms.Button();
             this.picASCOM = new System.Windows.Forms.PictureBox();
-            this.textBoxIPPort = new System.Windows.Forms.TextBox();
-            this.label_Port = new System.Windows.Forms.Label();
-            this.label_AddressIP = new System.Windows.Forms.Label();
-            this.textBoxIPAddress = new System.Windows.Forms.TextBox();
-            this.labelLink = new System.Windows.Forms.Label();
-            this.comboSerialPort = new System.Windows.Forms.ComboBox();
             this.groupBoxTelescopeGeometry = new System.Windows.Forms.GroupBox();
             this.label_mmFoc = new System.Windows.Forms.Label();
             this.textBoxFocalLength = new System.Windows.Forms.TextBox();
@@ -56,19 +50,10 @@ namespace ASCOM.ZeGoto
             this.chkTrace = new System.Windows.Forms.CheckBox();
             this.labelVersion = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.groupBoxMountSetting = new System.Windows.Forms.GroupBox();
-            this.labelXSideralRate = new System.Windows.Forms.Label();
-            this.textBoxMaxRate = new System.Windows.Forms.TextBox();
-            this.labelMaxRate = new System.Windows.Forms.Label();
-            this.groupBoxParkPosition = new System.Windows.Forms.GroupBox();
-            this.comboBoxParkPosition = new System.Windows.Forms.ComboBox();
-            this.labelParkPosition = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.groupBoxTelescopeGeometry.SuspendLayout();
             this.groupBoxSiteLocation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.groupBoxMountSetting.SuspendLayout();
-            this.groupBoxParkPosition.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -77,7 +62,7 @@ namespace ASCOM.ZeGoto
             this.cmdOK.BackColor = System.Drawing.SystemColors.Control;
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.cmdOK.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.cmdOK.Location = new System.Drawing.Point(343, 336);
+            this.cmdOK.Location = new System.Drawing.Point(343, 214);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(75, 23);
             this.cmdOK.TabIndex = 0;
@@ -91,7 +76,7 @@ namespace ASCOM.ZeGoto
             this.cmdCancel.BackColor = System.Drawing.SystemColors.Control;
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cmdCancel.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.cmdCancel.Location = new System.Drawing.Point(262, 336);
+            this.cmdCancel.Location = new System.Drawing.Point(262, 214);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(75, 23);
             this.cmdCancel.TabIndex = 1;
@@ -113,66 +98,6 @@ namespace ASCOM.ZeGoto
             this.picASCOM.Click += new System.EventHandler(this.BrowseToAscom);
             this.picASCOM.DoubleClick += new System.EventHandler(this.BrowseToAscom);
             // 
-            // textBoxIPPort
-            // 
-            this.textBoxIPPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxIPPort.Enabled = false;
-            this.textBoxIPPort.Location = new System.Drawing.Point(358, 92);
-            this.textBoxIPPort.Name = "textBoxIPPort";
-            this.textBoxIPPort.Size = new System.Drawing.Size(60, 20);
-            this.textBoxIPPort.TabIndex = 37;
-            this.textBoxIPPort.Text = "4030";
-            // 
-            // label_Port
-            // 
-            this.label_Port.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_Port.AutoSize = true;
-            this.label_Port.ForeColor = System.Drawing.Color.White;
-            this.label_Port.Location = new System.Drawing.Point(326, 95);
-            this.label_Port.Name = "label_Port";
-            this.label_Port.Size = new System.Drawing.Size(26, 13);
-            this.label_Port.TabIndex = 36;
-            this.label_Port.Text = "Port";
-            // 
-            // label_AddressIP
-            // 
-            this.label_AddressIP.AutoSize = true;
-            this.label_AddressIP.BackColor = System.Drawing.Color.Black;
-            this.label_AddressIP.ForeColor = System.Drawing.Color.White;
-            this.label_AddressIP.Location = new System.Drawing.Point(12, 95);
-            this.label_AddressIP.Name = "label_AddressIP";
-            this.label_AddressIP.Size = new System.Drawing.Size(58, 13);
-            this.label_AddressIP.TabIndex = 35;
-            this.label_AddressIP.Text = "IP Address";
-            // 
-            // textBoxIPAddress
-            // 
-            this.textBoxIPAddress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxIPAddress.Enabled = false;
-            this.textBoxIPAddress.Location = new System.Drawing.Point(76, 92);
-            this.textBoxIPAddress.Name = "textBoxIPAddress";
-            this.textBoxIPAddress.Size = new System.Drawing.Size(244, 20);
-            this.textBoxIPAddress.TabIndex = 34;
-            // 
-            // labelLink
-            // 
-            this.labelLink.AutoSize = true;
-            this.labelLink.Location = new System.Drawing.Point(12, 68);
-            this.labelLink.Name = "labelLink";
-            this.labelLink.Size = new System.Drawing.Size(27, 13);
-            this.labelLink.TabIndex = 33;
-            this.labelLink.Text = "Link";
-            // 
-            // comboSerialPort
-            // 
-            this.comboSerialPort.FormattingEnabled = true;
-            this.comboSerialPort.Location = new System.Drawing.Point(76, 65);
-            this.comboSerialPort.Name = "comboSerialPort";
-            this.comboSerialPort.Size = new System.Drawing.Size(69, 21);
-            this.comboSerialPort.TabIndex = 32;
-            this.comboSerialPort.SelectedIndexChanged += new System.EventHandler(this.comboSerialPort_SelectedIndexChanged);
-            // 
             // groupBoxTelescopeGeometry
             // 
             this.groupBoxTelescopeGeometry.Controls.Add(this.label_mmFoc);
@@ -182,7 +107,7 @@ namespace ASCOM.ZeGoto
             this.groupBoxTelescopeGeometry.Controls.Add(this.textBoxAperture);
             this.groupBoxTelescopeGeometry.Controls.Add(this.labelAperture);
             this.groupBoxTelescopeGeometry.ForeColor = System.Drawing.Color.White;
-            this.groupBoxTelescopeGeometry.Location = new System.Drawing.Point(15, 118);
+            this.groupBoxTelescopeGeometry.Location = new System.Drawing.Point(15, 74);
             this.groupBoxTelescopeGeometry.Name = "groupBoxTelescopeGeometry";
             this.groupBoxTelescopeGeometry.Size = new System.Drawing.Size(200, 75);
             this.groupBoxTelescopeGeometry.TabIndex = 38;
@@ -250,7 +175,7 @@ namespace ASCOM.ZeGoto
             this.groupBoxSiteLocation.Controls.Add(this.textBoxLatitude);
             this.groupBoxSiteLocation.Controls.Add(this.labelLatitude);
             this.groupBoxSiteLocation.ForeColor = System.Drawing.Color.White;
-            this.groupBoxSiteLocation.Location = new System.Drawing.Point(221, 118);
+            this.groupBoxSiteLocation.Location = new System.Drawing.Point(221, 74);
             this.groupBoxSiteLocation.Name = "groupBoxSiteLocation";
             this.groupBoxSiteLocation.Size = new System.Drawing.Size(197, 126);
             this.groupBoxSiteLocation.TabIndex = 39;
@@ -331,7 +256,7 @@ namespace ASCOM.ZeGoto
             // 
             this.chkTrace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(15, 329);
+            this.chkTrace.Location = new System.Drawing.Point(15, 207);
             this.chkTrace.Name = "chkTrace";
             this.chkTrace.Size = new System.Drawing.Size(73, 17);
             this.chkTrace.TabIndex = 40;
@@ -342,7 +267,7 @@ namespace ASCOM.ZeGoto
             // 
             this.labelVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.labelVersion.AutoSize = true;
-            this.labelVersion.Location = new System.Drawing.Point(12, 349);
+            this.labelVersion.Location = new System.Drawing.Point(12, 227);
             this.labelVersion.Name = "labelVersion";
             this.labelVersion.Size = new System.Drawing.Size(41, 13);
             this.labelVersion.TabIndex = 41;
@@ -357,98 +282,17 @@ namespace ASCOM.ZeGoto
             this.pictureBox1.TabIndex = 42;
             this.pictureBox1.TabStop = false;
             // 
-            // groupBoxMountSetting
-            // 
-            this.groupBoxMountSetting.Controls.Add(this.labelXSideralRate);
-            this.groupBoxMountSetting.Controls.Add(this.textBoxMaxRate);
-            this.groupBoxMountSetting.Controls.Add(this.labelMaxRate);
-            this.groupBoxMountSetting.ForeColor = System.Drawing.Color.White;
-            this.groupBoxMountSetting.Location = new System.Drawing.Point(15, 199);
-            this.groupBoxMountSetting.Name = "groupBoxMountSetting";
-            this.groupBoxMountSetting.Size = new System.Drawing.Size(200, 54);
-            this.groupBoxMountSetting.TabIndex = 43;
-            this.groupBoxMountSetting.TabStop = false;
-            this.groupBoxMountSetting.Text = "Mount setting";
-            // 
-            // labelXSideralRate
-            // 
-            this.labelXSideralRate.AutoSize = true;
-            this.labelXSideralRate.Location = new System.Drawing.Point(116, 20);
-            this.labelXSideralRate.Name = "labelXSideralRate";
-            this.labelXSideralRate.Size = new System.Drawing.Size(68, 13);
-            this.labelXSideralRate.TabIndex = 26;
-            this.labelXSideralRate.Text = "X sideral rate";
-            // 
-            // textBoxMaxRate
-            // 
-            this.textBoxMaxRate.Location = new System.Drawing.Point(64, 17);
-            this.textBoxMaxRate.Name = "textBoxMaxRate";
-            this.textBoxMaxRate.Size = new System.Drawing.Size(46, 20);
-            this.textBoxMaxRate.TabIndex = 25;
-            // 
-            // labelMaxRate
-            // 
-            this.labelMaxRate.AutoSize = true;
-            this.labelMaxRate.Location = new System.Drawing.Point(10, 20);
-            this.labelMaxRate.Name = "labelMaxRate";
-            this.labelMaxRate.Size = new System.Drawing.Size(48, 13);
-            this.labelMaxRate.TabIndex = 0;
-            this.labelMaxRate.Text = "Max rate";
-            // 
-            // groupBoxParkPosition
-            // 
-            this.groupBoxParkPosition.Controls.Add(this.labelParkPosition);
-            this.groupBoxParkPosition.Controls.Add(this.comboBoxParkPosition);
-            this.groupBoxParkPosition.ForeColor = System.Drawing.Color.White;
-            this.groupBoxParkPosition.Location = new System.Drawing.Point(15, 260);
-            this.groupBoxParkPosition.Name = "groupBoxParkPosition";
-            this.groupBoxParkPosition.Size = new System.Drawing.Size(200, 55);
-            this.groupBoxParkPosition.TabIndex = 44;
-            this.groupBoxParkPosition.TabStop = false;
-            this.groupBoxParkPosition.Text = "Park position";
-            // 
-            // comboBoxParkPosition
-            // 
-            this.comboBoxParkPosition.FormattingEnabled = true;
-            this.comboBoxParkPosition.Items.AddRange(new object[] {
-            "Custom Alt/Az",
-            "Position 1",
-            "Position 2",
-            "Position 3",
-            "Position 4"});
-            this.comboBoxParkPosition.Location = new System.Drawing.Point(85, 20);
-            this.comboBoxParkPosition.Name = "comboBoxParkPosition";
-            this.comboBoxParkPosition.Size = new System.Drawing.Size(109, 21);
-            this.comboBoxParkPosition.TabIndex = 0;
-            // 
-            // labelParkPosition
-            // 
-            this.labelParkPosition.AutoSize = true;
-            this.labelParkPosition.Location = new System.Drawing.Point(10, 23);
-            this.labelParkPosition.Name = "labelParkPosition";
-            this.labelParkPosition.Size = new System.Drawing.Size(68, 13);
-            this.labelParkPosition.TabIndex = 1;
-            this.labelParkPosition.Text = "Park position";
-            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(430, 371);
-            this.Controls.Add(this.groupBoxParkPosition);
-            this.Controls.Add(this.groupBoxMountSetting);
+            this.ClientSize = new System.Drawing.Size(430, 249);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.labelVersion);
             this.Controls.Add(this.chkTrace);
             this.Controls.Add(this.groupBoxSiteLocation);
             this.Controls.Add(this.groupBoxTelescopeGeometry);
-            this.Controls.Add(this.textBoxIPPort);
-            this.Controls.Add(this.label_Port);
-            this.Controls.Add(this.label_AddressIP);
-            this.Controls.Add(this.textBoxIPAddress);
-            this.Controls.Add(this.labelLink);
-            this.Controls.Add(this.comboSerialPort);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.cmdCancel);
             this.Controls.Add(this.cmdOK);
@@ -466,10 +310,6 @@ namespace ASCOM.ZeGoto
             this.groupBoxSiteLocation.ResumeLayout(false);
             this.groupBoxSiteLocation.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.groupBoxMountSetting.ResumeLayout(false);
-            this.groupBoxMountSetting.PerformLayout();
-            this.groupBoxParkPosition.ResumeLayout(false);
-            this.groupBoxParkPosition.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -480,12 +320,6 @@ namespace ASCOM.ZeGoto
         private System.Windows.Forms.Button cmdOK;
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.PictureBox picASCOM;
-        private System.Windows.Forms.TextBox textBoxIPPort;
-        private System.Windows.Forms.Label label_Port;
-        private System.Windows.Forms.Label label_AddressIP;
-        private System.Windows.Forms.TextBox textBoxIPAddress;
-        private System.Windows.Forms.Label labelLink;
-        private System.Windows.Forms.ComboBox comboSerialPort;
         private System.Windows.Forms.GroupBox groupBoxTelescopeGeometry;
         private System.Windows.Forms.Label label_mmFoc;
         private System.Windows.Forms.TextBox textBoxFocalLength;
@@ -505,12 +339,5 @@ namespace ASCOM.ZeGoto
         private System.Windows.Forms.CheckBox chkTrace;
         private System.Windows.Forms.Label labelVersion;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.GroupBox groupBoxMountSetting;
-        private System.Windows.Forms.Label labelXSideralRate;
-        private System.Windows.Forms.TextBox textBoxMaxRate;
-        private System.Windows.Forms.Label labelMaxRate;
-        private System.Windows.Forms.GroupBox groupBoxParkPosition;
-        private System.Windows.Forms.Label labelParkPosition;
-        private System.Windows.Forms.ComboBox comboBoxParkPosition;
     }
 }
