@@ -108,6 +108,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Networkd.lib;Qt5SerialPortd.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>set QTDIR=$(QTDIR)
+copy /Y "%QTDIR%\bin\Qt5Cored.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Guid.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Networkd.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Widgetsd.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5SerialPortd.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\libGLESv2d.dll" "$(OutDir)"
+if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
+copy /Y "%QTDIR%\plugins\platforms\qwindows.dll" %1\platforms</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -147,7 +158,15 @@ copydll.cmd "$(OutDir)"
     </Link>
     <PostBuildEvent>
       <Command>set QTDIR=$(QTDIR)
-copydll.cmd "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Core.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Gui.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Network.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5Widgets.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\Qt5SerialPort.dll" "$(OutDir)"
+copy /Y "%QTDIR%\bin\libGLESv2.dll" "$(OutDir)"
+if not exist "$(OutDir)platforms" mkdir "$(OutDir)platforms"
+copy /Y "%QTDIR%\plugins\platforms\qwindows.dll" %1\platforms
+build_number.cmd
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
