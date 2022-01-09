@@ -236,7 +236,7 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandBlind", command + " Exception.Message: " + e.Message);
+                tl.LogMessage("CommandBlind", "Exception.Message: " + e.Message);
                 throw e;
             }
         }
@@ -264,7 +264,7 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandBool", command + " Exception.Message: " + e.Message);
+                tl.LogMessage("CommandBool", "Exception.Message: " + e.Message);
                 throw e;
             }
         }
@@ -308,7 +308,7 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandString", command + " Exception.Message: " + e.Message);
+                tl.LogMessage("CommandString", "Exception.Message: " + e.Message);
                 throw e;
             }
         }
@@ -426,19 +426,15 @@ namespace ASCOM.ZeGoto
                     rx = new Regex(@"[\+\-]*[0-9\.]+([^0-9\.]+)[0-9\.]*([^0-9\.]*)[0-9\.]*([^0-9\.]*)");
                     mt = rx.Matches(sRA);
                     SharedResources.RADelimHrs = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
-                    tl.LogMessage("LongFormat = ", SharedResources.LongFormat.ToString());
                     if (SharedResources.LongFormat)
                     {
                         SharedResources.RADelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
                         SharedResources.RADelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
-                        tl.LogMessage("shared.RADelimMin", SharedResources.RADelimMin.ToString());
-                        tl.LogMessage("shared.RADelimSec", SharedResources.RADelimSec.ToString());
                     }
                     else
                     {
                         SharedResources.RADelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
                         SharedResources.RADelimSec = "";
-                        tl.LogMessage("shared.RADelimMin", SharedResources.RADelimMin.ToString());
                     }
                     mt = rx.Matches(sDec);
                     SharedResources.DecDelimDeg = DelimTrim(mt[0].Groups[1].Value);       // Hours delimiter
@@ -446,14 +442,11 @@ namespace ASCOM.ZeGoto
                     {
                         SharedResources.DecDelimMin = DelimTrim(mt[0].Groups[2].Value);   // Minutes delimiter
                         SharedResources.DecDelimSec = mt[0].Groups[3].Value.Trim();       // Don't append trailing blanks
-                        tl.LogMessage("shared.DecDelimMin", SharedResources.DecDelimMin.ToString());
-                        tl.LogMessage("shared.DecDelimSec", SharedResources.DecDelimSec.ToString());
                     }
                     else
                     {
                         SharedResources.DecDelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
                         SharedResources.DecDelimSec = "";
-                        tl.LogMessage("shared.DecDelimMin", SharedResources.DecDelimMin.ToString());
                     }
 
                     tl.LogMessage("Connected Set", "Connected.");
@@ -856,15 +849,15 @@ namespace ASCOM.ZeGoto
                 PierSide val = PierSide.pierUnknown; ;
 
                 string side = CommandString("pS", false);
-                if (side == "East#")
+                if (side.StartsWith("East"))
                 {
                     val = PierSide.pierEast;
                 }
-                else if (side == "West#")
+                else if (side.StartsWith("West"))
                 {
                     val = PierSide.pierWest;
                 }
-                tl.LogMessage("SideOfPier Get", val.ToString());
+                tl.LogMessage("SideOfPier Get", side + " = " + val.ToString());
                 return val;
             }
             set
