@@ -45,9 +45,9 @@ Source: "x64\Release\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ign
 Source: "Win32\Release\ZeGotoControlCenter.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion solidbreak
 Source: "Win32\Release\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 ; ASCOM driver, 32 and 64 bits
-Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Flags: ignoreversion solidbreak
-Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Server.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "ASCOM_Server\bin\Release\ASCOM.ZeGoto.Telescope.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "x64\Release\ASCOM.ZeGoto.Server.exe"; DestDir: "{app}"; Flags: ignoreversion solidbreak
+Source: "x64\Release\ASCOM.ZeGoto.Server.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "x64\Release\ASCOM.ZeGoto.Telescope.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; Firmware
 Source: "C:\Users\ZeSly\MPLABXProjects\ZeGoto.X\release\*.hex"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
