@@ -164,7 +164,7 @@ namespace ASCOM.ZeGoto
             tl = new TraceLogger("ZeGoto");
             //#endif
             tl.Enabled = traceState;
-            tl.LogMessage("Telescope", "Starting initialisation");
+            tl.LogMessage("Telescope", "Starting initialisation " + System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             utilities = new Util(); //Initialise util object
             //SharedResources.SharedLink = new SerialOrSocket();
@@ -190,7 +190,7 @@ namespace ASCOM.ZeGoto
         {
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
-            if (IsConnected)
+            if (SharedResources.Connected)
             {
                 System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
             }
@@ -235,7 +235,8 @@ namespace ASCOM.ZeGoto
             catch (Exception e)
             {
                 SharedResources.SharedLink.ClearBuffers();
-                SharedResources.Connected = false;  // Release the port
+                //SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandBlind", "Exception command=" + command + " raw=" + raw.ToString());
                 tl.LogMessage("CommandBlind", "Exception.Message: " + e.Message);
                 throw e;
             }
@@ -263,7 +264,8 @@ namespace ASCOM.ZeGoto
             catch (Exception e)
             {
                 SharedResources.SharedLink.ClearBuffers();
-                SharedResources.Connected = false;  // Release the port
+                //SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandBool", "Exception command=" + command + " raw=" + raw.ToString());
                 tl.LogMessage("CommandBool", "Exception.Message: " + e.Message);
                 throw e;
             }
@@ -307,7 +309,8 @@ namespace ASCOM.ZeGoto
             catch (Exception e)
             {
                 SharedResources.SharedLink.ClearBuffers();
-                SharedResources.Connected = false;  // Release the port
+                //SharedResources.Connected = false;  // Release the port
+                tl.LogMessage("CommandString", "Exception command=" + command + " raw=" + raw.ToString());
                 tl.LogMessage("CommandString", "Exception.Message: " + e.Message);
                 throw e;
             }
@@ -331,17 +334,13 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                tl.LogMessage("Connected Get", IsConnected.ToString());
-                return IsConnected;
+                tl.LogMessage("Connected Get", SharedResources.Connected.ToString());
+                return SharedResources.Connected;
             }
             set
             {
                 tl.LogMessage("Connected Set", value.ToString());
-                if (value == IsConnected)
-                {
-                    tl.LogMessage(value ? "Already connected" : "Already disconnected", "");
-                }
-                else if (value)
+                if (value)
                 {
                     string sRA, sDec;
                     Regex rx;
@@ -376,8 +375,8 @@ namespace ASCOM.ZeGoto
                         SharedResources.SharedLink.Port = 5085;
                         SharedResources.SharedLink.TcpIp = true;
                         SharedResources.SharedLink.ReceiveTimeout = 5;
-                        SharedResources.Connected = true;
                     }
+                    SharedResources.Connected = true;
 
                     // 2) Determine that there is an LX200 scope there, initialize
                     //     some variables for below...
@@ -448,17 +447,20 @@ namespace ASCOM.ZeGoto
                         SharedResources.DecDelimMin = mt[0].Groups[2].Value.Trim();        // Don't append trailing blanks
                         SharedResources.DecDelimSec = "";
                     }
-
-                    tl.LogMessage("Connected Set", "Connected.");
+                    
+                    tl.LogMessage("Connected Set", "Connected. nb connections=" + SharedResources.connections.ToString());
                 }
                 else
                 {
-                    tl.LogMessage("Connected Set", "Disconnecting...");
+                    tl.LogMessage("Connected Set", "Disconnecting... nb connections=" + SharedResources.connections.ToString());
 
                     SharedResources.SharedLink.ClearBuffers();    // Clear serial buffers
                     SharedResources.Connected = false;
 
-                    tl.LogMessage("Connected Set", "Disconnected.");
+                    if (SharedResources.Connected)
+                        tl.LogMessage("Connected Set", "Still connected. nb connections=" + SharedResources.connections.ToString());
+                    else
+                        tl.LogMessage("Connected Set", "Disconnected. nb connections=" + SharedResources.connections.ToString());
                 }
             }
         }
@@ -494,7 +496,7 @@ namespace ASCOM.ZeGoto
                 if (objCopyright.Copyright != "") sDriverInfo = sDriverInfo + "\r\n" + objCopyright.Copyright;
                 if (objDescription.Description != "") sDriverInfo = sDriverInfo + "\r\n" + objDescription.Description;
 
-                if (IsConnected)
+                if (SharedResources.Connected)
                 {
                     sDriverInfo += "\r\nFirmware version: " + CommandString("GVN", false);
                     sDriverInfo += "\r\nFirmware date: " + CommandString("GVD", false) + " " + CommandString("GVT", false);
@@ -649,9 +651,9 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                double declination = 0.0;
-                tl.LogMessage("DeclinationRate", "Get - " + declination.ToString());
-                return declination;
+                double declinationRate = 0.0;
+                tl.LogMessage("DeclinationRate", "Get - " + declinationRate.ToString());
+                return declinationRate;
             }
             set
             {
@@ -709,8 +711,11 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                tl.LogMessage("GuideRateDeclination Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("GuideRateDeclination", false);
+                string rate = this.CommandString("rG", false);
+                double guideRateDeclination = double.Parse(rate) / 10.0;
+                guideRateDeclination = 360.0 / (23.0 * 3600.0 + 56.0 * 60.0 + 40) * guideRateDeclination;
+                tl.LogMessage("GuideRateDeclination", "Get - :rG# " + rate + " guideRateDeclination=" + guideRateDeclination);
+                return guideRateDeclination;
             }
             set
             {
@@ -723,8 +728,11 @@ namespace ASCOM.ZeGoto
         {
             get
             {
-                tl.LogMessage("GuideRateRightAscension Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("GuideRateRightAscension", false);
+                string rate = this.CommandString("rG", false);
+                double guideRateRightAscension = double.Parse(rate) / 10.0;
+                guideRateRightAscension = 360.0 / (23.0 * 3600.0 + 56.0 * 60.0 + 40) * guideRateRightAscension;
+                tl.LogMessage("GuideRateRightAscension", "Get - :rG# " + rate + " guideRateRightAscension=" + guideRateRightAscension);
+                return guideRateRightAscension;
             }
             set
             {
@@ -808,7 +816,7 @@ namespace ASCOM.ZeGoto
             }
 
             this.CommandBlind("Mg" + d + Duration.ToString("0000"), false);
-            tl.LogMessage("PulseGuide", d + " " + Duration.ToString() + "ms");
+            tl.LogMessage("PulseGuide", Direction.ToString() + " " + Duration.ToString() + "ms");
         }
 
         public double RightAscension
@@ -1334,7 +1342,7 @@ namespace ASCOM.ZeGoto
             set
             {
                 tl.LogMessage("Tracking Set", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("Tracking", true);
+                //throw new ASCOM.PropertyNotImplementedException("Tracking", true);
             }
         }
 
@@ -1469,17 +1477,6 @@ namespace ASCOM.ZeGoto
 
         #endregion
 
-        /// <summary>
-        /// Returns true if there is a valid connection to the driver hardware
-        /// </summary>
-        private bool IsConnected
-        {
-            get
-            {
-                // TODO check that the driver hardware connection exists and is connected to the hardware
-                return SharedResources.Connected;
-            }
-        }
 
         /// <summary>
         /// Use this function to throw an exception if we aren't connected to the hardware
@@ -1487,7 +1484,7 @@ namespace ASCOM.ZeGoto
         /// <param name="message"></param>
         private void CheckConnected(string message)
         {
-            if (!IsConnected)
+            if (!SharedResources.Connected)
             {
                 throw new ASCOM.NotConnectedException(message);
             }
