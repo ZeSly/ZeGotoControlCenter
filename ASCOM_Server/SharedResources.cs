@@ -82,7 +82,6 @@ namespace ASCOM.ZeGoto
             lock (lockObject)
             {
                 SharedLink.Transmit(message);
-                // TODO replace this with your requirements
                 return SharedLink.ReceiveTerminated("#");
             }
         }

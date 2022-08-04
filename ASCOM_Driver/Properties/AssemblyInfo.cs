@@ -6,13 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-// TODO - Add your authorship information here
 [assembly: AssemblyTitle("ASCOM.ZeGoto.Telescope")]
 [assembly: AssemblyDescription("ASCOM Telescope driver for ZeGoto")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ZeSly")]
 [assembly: AssemblyProduct("ZeGoto")]
-[assembly: AssemblyCopyright("Copyright © 2015 Sylvain Girard")]
+[assembly: AssemblyCopyright("Copyright © 2015-2022 Sylvain Girard")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
