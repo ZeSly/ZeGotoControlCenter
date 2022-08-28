@@ -238,8 +238,8 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 //SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandBlind", "Exception command=" + command + " raw=" + raw.ToString());
-                tl.LogMessage("CommandBlind", "Exception.Message: " + e.Message);
+                tl.LogIssue("CommandBlind", "Exception command=" + command + " raw=" + raw.ToString());
+                tl.LogIssue("CommandString", $"Exception: {e}");
                 throw e;
             }
         }
@@ -267,8 +267,8 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 //SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandBool", "Exception command=" + command + " raw=" + raw.ToString());
-                tl.LogMessage("CommandBool", "Exception.Message: " + e.Message);
+                tl.LogIssue("CommandBool", "Exception command=" + command + " raw=" + raw.ToString());
+                tl.LogIssue("CommandString", $"Exception: {e}");
                 throw e;
             }
         }
@@ -282,7 +282,6 @@ namespace ASCOM.ZeGoto
 
                 lock (lockObject)
                 {
-
                     CheckConnected("CommandString");
 
                     string buf;
@@ -312,8 +311,8 @@ namespace ASCOM.ZeGoto
             {
                 SharedResources.SharedLink.ClearBuffers();
                 //SharedResources.Connected = false;  // Release the port
-                tl.LogMessage("CommandString", "Exception command=" + command + " raw=" + raw.ToString());
-                tl.LogMessage("CommandString", "Exception.Message: " + e.Message);
+                tl.LogIssue("CommandString", "Exception command=" + command + " raw=" + raw.ToString());
+                tl.LogIssue("CommandString", $"Exception: {e}");
                 throw e;
             }
         }
@@ -367,8 +366,8 @@ namespace ASCOM.ZeGoto
                         catch (Exception e)
                         {
                             SharedResources.Connected = false;
-                            tl.LogMessage("Connected Set", d);
-                            tl.LogMessage("Connected Set", ZeGotoControlCenterPath + " : " + e.Message);
+                            tl.LogIssue("Connected Set", d);
+                            tl.LogIssue("Connected Set", ZeGotoControlCenterPath + $": {e}");
                             //Exception myexp = new Exception(ZeGotoControlCenterPath + " : " + e.Message);
                             //throw myexp;
                         }
@@ -399,7 +398,7 @@ namespace ASCOM.ZeGoto
                     {
                         SharedResources.SharedLink.ClearBuffers();
                         SharedResources.Connected = false;  // Release the port
-                        tl.LogMessage("Connected Set", "Error: No response from ZeGotoControlCenter !");
+                        tl.LogIssue("Connected Set", "Error: No response from ZeGotoControlCenter !");
                         throw new NotConnectedException(e.Message + "\r\nNo response from ZeGotoControlCenter !");
                     }
                     SharedResources.SharedLink.ClearBuffers();        // Toss any junk remaining in buffers
