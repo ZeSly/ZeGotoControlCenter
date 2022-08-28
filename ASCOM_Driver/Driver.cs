@@ -35,6 +35,7 @@ using ASCOM;
 using ASCOM.Astrometry;
 using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
+
 using System.Globalization;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -42,6 +43,8 @@ using System.Reflection;
 using System.Configuration;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
+using System.Timers;
 
 namespace ASCOM.ZeGoto
 {
@@ -107,10 +110,7 @@ namespace ASCOM.ZeGoto
         /// </summary>
         private TraceLogger tl;
 
-        /// <summary>
-        /// Private variable to hold the SharedResources.SharedLink to ZeGoto through serial port or TCP/IP socket
-        /// </summary>
-        //private SerialOrSocket SharedResources.SharedLink;
+        private System.Timers.Timer pulseGuideTimer;
 
         //
         // Constants
@@ -145,6 +145,7 @@ namespace ASCOM.ZeGoto
         private bool m_bTargetRAValid;
         private double m_dTargetDec;
         private bool m_bTargetDecValid;
+        private bool m_IsPulseGuiding;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ZeGoto"/> class.
@@ -166,10 +167,13 @@ namespace ASCOM.ZeGoto
             tl.LogMessage("Telescope", "Starting initialisation " + System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             utilities = new Util(); //Initialise util object
-            //SharedResources.SharedLink = new SerialOrSocket();
 
             SharedResources.isParked = false;
             tl.LogMessage("Telescope", "Completed initialisation");
+
+            pulseGuideTimer = new System.Timers.Timer();
+            pulseGuideTimer.AutoReset = false;
+            pulseGuideTimer.Elapsed += PulseGuideTimer_Elapsed;
         }
 
 
@@ -224,12 +228,11 @@ namespace ASCOM.ZeGoto
         {
             try
             {
+                string rawCommand = raw ? command : ":" + command + "#";
+                tl.LogMessage("CommandBlind", "  " + rawCommand);
                 CheckConnected("CommandBlind");
                 SharedResources.SharedLink.ClearBuffers();                    // Clear remaining junk in buffer
-                if (!raw)
-                    SharedResources.SharedLink.Transmit(":" + command + "#");
-                else
-                    SharedResources.SharedLink.Transmit(command);
+                SharedResources.SharedLink.Transmit(rawCommand);
             }
             catch (Exception e)
             {
@@ -247,14 +250,14 @@ namespace ASCOM.ZeGoto
 
             try
             {
+                string rawCommand = raw ? command : ":" + command + "#";
+                tl.LogMessage("CommandBool", "  " + rawCommand);
+
                 lock (lockObject)
                 {
                     CheckConnected("CommandBool");
                     SharedResources.SharedLink.ClearBuffers();    // Clear remaining junk in buffer
-                    if (!raw)
-                        SharedResources.SharedLink.Transmit(":" + command + "#");
-                    else
-                        SharedResources.SharedLink.Transmit(command);
+                    SharedResources.SharedLink.Transmit(rawCommand);
                     ret = SharedResources.SharedLink.ReceiveCounted(1);   // Just a 1 or 0
 
                     return (ret == "1");
@@ -274,13 +277,13 @@ namespace ASCOM.ZeGoto
         {
             try
             {
+                string rawCommand = raw ? command : ":" + command + "#";
+                tl.LogMessage("CommandString", "  " + rawCommand);
+
                 lock (lockObject)
                 {
 
                     CheckConnected("CommandString");
-                    // it's a good idea to put all the low level communication with the device here,
-                    // then all communication calls this function
-                    // you need something to ensure that only one command is in progress at a time
 
                     string buf;
                     string ret = "";
@@ -288,7 +291,7 @@ namespace ASCOM.ZeGoto
                     SharedResources.SharedLink.ClearBuffers();
                     if (!raw)
                     {
-                        SharedResources.SharedLink.Transmit(":" + command + "#");
+                        SharedResources.SharedLink.Transmit(rawCommand);
                         buf = SharedResources.SharedLink.ReceiveTerminated("#");
                         if (buf != "")  // Overflow protection
                         {
@@ -297,7 +300,7 @@ namespace ASCOM.ZeGoto
                     }
                     else
                     {
-                        SharedResources.SharedLink.Transmit(command);
+                        SharedResources.SharedLink.Transmit(rawCommand);
                         buf = SharedResources.SharedLink.Receive();
                         ret = buf;
                     }
@@ -366,8 +369,8 @@ namespace ASCOM.ZeGoto
                             SharedResources.Connected = false;
                             tl.LogMessage("Connected Set", d);
                             tl.LogMessage("Connected Set", ZeGotoControlCenterPath + " : " + e.Message);
-                            Exception myexp = new Exception(ZeGotoControlCenterPath + " : " + e.Message);
-                            throw myexp;
+                            //Exception myexp = new Exception(ZeGotoControlCenterPath + " : " + e.Message);
+                            //throw myexp;
                         }
 
                         SharedResources.SharedLink.IPAddress = "127.0.0.1";
@@ -744,7 +747,7 @@ namespace ASCOM.ZeGoto
             get
             {
                 tl.LogMessage("IsPulseGuiding", "Get - " + false.ToString());
-                return false;
+                return m_IsPulseGuiding;
             }
         }
 
@@ -815,12 +818,23 @@ namespace ASCOM.ZeGoto
 
             this.CommandBlind("Mg" + d + Duration.ToString("0000"), false);
             tl.LogMessage("PulseGuide", Direction.ToString() + " " + Duration.ToString() + "ms");
+
+            m_IsPulseGuiding = true;
+
+            pulseGuideTimer.Enabled = true;
+        }
+
+        private void PulseGuideTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            m_IsPulseGuiding = false;
+            tl.LogMessage("PulseGuide", "finished");
         }
 
         public double RightAscension
         {
             get
             {
+                Thread.Sleep(250);
                 double rightAscension = utilities.HMSToHours(this.CommandString("GR", false));
                 tl.LogMessage("RightAscension", "Get - " + utilities.HoursToHMS(rightAscension));
                 return rightAscension;
